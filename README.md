@@ -8,6 +8,12 @@
 
 APKEditor Futuristic es una interfaz gráfica moderna (Swing) que envuelve el motor original de APKEditor para ofrecer una experiencia visual tipo dashboard para las operaciones más comunes sobre archivos APK:
 
+##
+
+```
+gradle  fatJar
+```
+
 ## 🖥️ Iniciar la interfaz gráfica
 
 Opción 1 – Desde el JAR empaquetado:
