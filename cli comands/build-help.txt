@@ -1,0 +1,52 @@
+Builds android binary from json/xml/raw.                                        
+Options:                                                                        
+  -framework            Path of framework file (can be multiple).               
+  -framework-version    Preferred framework version number                      
+  -i                    Input path.                                             
+  -o                    Output path. Optional, if not provided then a new file  
+                        will be generated on same directory as input            
+  -res-dir              Sets resource files root dir name. e.g. for obfuscation 
+                        to move files from 'res/*' to 'r/*' or vice versa.      
+  -sig                  Signatures directory path.                              
+  -t                    Build types, By default build types determined by quick 
+                        scanning of input directory files. Values are:          
+                        [xml, json, raw, sig]                                   
+  -extractNativeLibs    Sets extractNativeLibs attribute on manifest and        
+                        applies compression of library files (*.so).            
+                          *Default = manifest                                   
+                          1) manifest: read and apply from manifest.            
+                          2) none: remove attribute from manifest and store     
+                        libraries compressed.                                   
+                          3) true: set manifest attribute 'true' and store      
+                        libraries compressed.                                   
+                          4) false: set manifest attribute 'false' and store    
+                        libraries un-compressed with 4096 alignment.            
+                        [manifest, none, false, true]                           
+  -dex-lib              Dex library to use:                                     
+                         1) internal : Use internal library, supports dex       
+                        versions up to 042.                                     
+                         2) jf : Use library by JesusFreke/smali, supports dex  
+                        versions 035 and below.                                 
+                          *Default = internal                                   
+                          *See <Notes> below.                                   
+                        [internal, jf]                                          
+Flags:                                                                          
+  -dex-profile          Encodes decoded dex profile json files to binary        
+                        assets/dexopt files.                                    
+  -f                    Force delete output path.                               
+  -h | -help | --help   Displays this help and exit.                            
+  -no-cache             Ignore built cached .dex files and re-build smali files.
+  -vrd                  Validate resources dir name                             
+                        (eg. if a drawable resource file path is 'res/abc.png'  
+                        then it will be moved to 'res/drawable/abc.png)'        
+Examples:                                                                       
+  1)  [Basic]                                                                   
+    java -jar APKEditor.jar b -i path/input_directory                           
+  2)  [Specify output]                                                          
+    java -jar APKEditor.jar b -i path/input_directory -o path/output.apk        
+  3)  [Restore signatures]                                                      
+    java -jar APKEditor.jar b -t sig -i path/input.apk -sig                     
+  path/signatures_dir                                                           
+  4)  [Specify framework]                                                       
+    java -jar APKEditor.jar b -i path/input_directory -framework                
+  framework-res.apk -framework platforms/android-32/android.jar                 

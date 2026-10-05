@@ -1,0 +1,31 @@
+Merges split apk files from directory or compressed apk files like XAPK,        
+APKM, APKS ...                                                                  
+Options:                                                                        
+  -i                    Input path.                                             
+  -o                    Output path. Optional, if not provided then a new file  
+                        will be generated on same directory as input            
+  -res-dir              Sets resource files root dir name. e.g. for obfuscation 
+                        to move files from 'res/*' to 'r/*' or vice versa.      
+  -extractNativeLibs    Sets extractNativeLibs attribute on manifest and        
+                        applies compression of library files (*.so).            
+                          *Default = manifest                                   
+                          1) manifest: read and apply from manifest.            
+                          2) none: remove attribute from manifest and store     
+                        libraries compressed.                                   
+                          3) true: set manifest attribute 'true' and store      
+                        libraries compressed.                                   
+                          4) false: set manifest attribute 'false' and store    
+                        libraries un-compressed with 4096 alignment.            
+                        [manifest, none, false, true]                           
+Flags:                                                                          
+  -clean-meta           Cleans META-INF directory along with signature block.   
+  -f                    Force delete output path.                               
+  -h | -help | --help   Displays this help and exit.                            
+  -validate-modules     Validates for same versionNumber of base.apk with split 
+                        apk files.                                              
+  -vrd                  Validate resources dir name                             
+                        (eg. if a drawable resource file path is 'res/abc.png'  
+                        then it will be moved to 'res/drawable/abc.png)'        
+Examples:                                                                       
+  1)  [Basic]                                                                   
+    java -jar APKEditor.jar m -i path/input -o path/output.apk                  

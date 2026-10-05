@@ -1,5 +1,6 @@
 package com.reandroid.apkeditor.gui;
 
+import com.reandroid.apkeditor.core.Operation;
 import com.reandroid.apkeditor.core.OperationRegistry;
 import com.reandroid.apkeditor.gui.components.*;
 import com.reandroid.apkeditor.gui.navigation.*;
@@ -106,8 +107,8 @@ public final class MainWindow extends JFrame {
         routes.put("protect", Route.PROTECT);
         routes.put("info", Route.INFO);
 
-        for (var entry : routes.entrySet()) {
-            var operation = registry.get(entry.getKey());
+        for (Map.Entry<String, Route> entry : routes.entrySet()) {
+            Operation operation = registry.get(entry.getKey());
             content.add(new OperationView(
                     entry.getKey(), operation, logs, progress,
                     busy -> status.setText(busy ? "● RUNNING" : "● READY")),

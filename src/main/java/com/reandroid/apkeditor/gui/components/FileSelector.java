@@ -10,7 +10,7 @@ import java.io.File;
 public final class FileSelector extends JPanel {
     private final JTextField field = new JTextField();
 
-    public FileSelector(String label, boolean directory) {
+    public FileSelector(String label) {
         setLayout(new BorderLayout(8, 4));
         setBackground(Colors.BACKGROUND);
 
@@ -19,7 +19,7 @@ public final class FileSelector extends JPanel {
         title.setForeground(Colors.TEXT_MUTED);
 
         NeonButton browse = new NeonButton("BROWSE");
-        browse.addActionListener(e -> choose(directory));
+        browse.addActionListener(e -> choose());
 
         field.setFont(Fonts.BODY);
         field.setBorder(BorderFactory.createLineBorder(Colors.BORDER));
@@ -33,11 +33,9 @@ public final class FileSelector extends JPanel {
         add(center, BorderLayout.CENTER);
     }
 
-    private void choose(boolean directory) {
+    private void choose() {
         JFileChooser chooser = new JFileChooser();
-        chooser.setFileSelectionMode(directory
-                ? JFileChooser.DIRECTORIES_ONLY
-                : JFileChooser.FILES_ONLY);
+        chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             field.setText(chooser.getSelectedFile().getAbsolutePath());
         }

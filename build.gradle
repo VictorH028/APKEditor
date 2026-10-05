@@ -11,9 +11,14 @@ application {
 }
 
 java {
-    // Definir la compatibilidad con Java 21
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_1_9)) {
+        options.release = 8
+    }
 }
 
 repositories {
@@ -50,7 +55,7 @@ task fatJar(type: Jar) {
     archiveClassifier = 'all'
     
     manifest {
-        attributes 'Main-Class': application.mainClass.get()
+        attributes 'Main-Class': 'com.reandroid.apkeditor.gui.GUIApplication'
     }
     
     from {

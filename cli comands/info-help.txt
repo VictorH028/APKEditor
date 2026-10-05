@@ -1,0 +1,60 @@
+Prints information of apk.                                                      
+Options:                                                                        
+  -filter-type          Prints only the specified resource type names           
+                          *This applies only when flag '-resources' used.       
+                          *Can be multiple.                                     
+  -framework            Path of framework file (can be multiple).               
+  -framework-version    Preferred framework version number                      
+  -i                    Input path.                                             
+  -o                    Output path. Optional, if not provided then a new file  
+                        will be generated on same directory as input            
+  -res                  Prints resource entries specified by either of:         
+                          1) Hex or decimal resource id.                        
+                          2) Full resource name e.g @string/app_name.           
+                         *Can be multiple.                                      
+  -xmlstrings           Print the strings of the given compiled xml assets.     
+                         *Can be multiple                                       
+  -xmltree              Prints the compiled xmls in the given assets.           
+                         *Can be multiple                                       
+  -t                    Print types/formats:                                    
+                        [text, json, xml]                                       
+Flags:                                                                          
+  -activities           Prints main activity class name. If verbose mode,       
+                        prints all declared activities including                
+                        <activity-alias>.                                       
+  -app-class            Application class name.                                 
+  -app-icon             App icon path/value. If verbose mode, prints all        
+                        configurations.                                         
+  -app-name             App name. If verbose mode, prints all configurations.   
+  -app-round-icon       App round icon path/value. If verbose mode, prints all  
+                        configurations.                                         
+  -configurations       Print the configurations in the APK.                    
+  -dex                  Prints dex information.                                 
+  -f                    Force delete output path.                               
+  -h | -help | --help   Displays this help and exit.                            
+  -languages            Print the languages in the APK.                         
+  -list-files           List files inside apk.                                  
+  -list-xml-files       List compiled xml files inside apk.                     
+  -locales              Print the locales in the APK.                           
+  -min-sdk-version      Minimum SDK version.                                    
+  -package              Package name(application id) from manifest and if       
+                        verbose mode, prints resource table packages.           
+  -permissions          Permissions.                                            
+  -resources            Prints all resources                                    
+  -signatures           Prints signature information.                           
+  -signatures-base64    Prints signature information with base64 certificates.  
+  -strings              Print the contents of the resource table string pool in 
+                        the APK.                                                
+  -target-sdk-version   Target SDK version.                                     
+  -v                    Verbose mode.                                           
+  -version-code         App version code.                                       
+  -version-name         App version name.                                       
+Examples:                                                                       
+  1)  [Basic]                                                                   
+    java -jar APKEditor.jar info -i file.apk                                    
+  2)  [Specify output and type]                                                 
+    java -jar APKEditor.jar info -i path/input.apk -t json -v -o                
+  info_file.json                                                                
+  3)  [Print only specific type]                                                
+    java -jar APKEditor.jar info -i path/input.apk -resources -filter-type      
+  drawable                                                                      

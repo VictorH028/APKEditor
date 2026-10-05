@@ -34,7 +34,7 @@ gradle  fatJar
 Opción 1 – Desde el JAR empaquetado:
 
 ```bash
-java -cp APKEditor-1.4.9-all.jar com.reandroid.apkeditor.gui.GUIApplication
+java -jar build/libs/APKEditor-1.4.9-all.jar
 ```
 
 
