@@ -1,16 +1,31 @@
 ![UI](./.img/ui.jpg) 
 
 <p align="center">
-  <b>⭐ APKEditor Futuristic es una interfaz ⭐</b>
+  <b>⭐ APKEditor Futuristic interfaz ⭐</b>
 </p>
 
 ## 📖 Descripción
 
-APKEditor Futuristic es una interfaz gráfica moderna (Swing) que envuelve el motor original de APKEditor para ofrecer una experiencia visual tipo dashboard para las operaciones más comunes sobre archivos APK:
+APKEditor Futuristic es una interfaz gráfica moderna  que envuelve el motor original de APKEditor.
 
-##
 
-```
+## Objetivo final 
+
+![ui_last](./.img/ui_last.png) 
+
+> [!WARNING]
+> Aunque exista la IA y sea buena jenerando codigo esto lo estoy haciendo para mejorar mis avilidades como programador y fortaleser mi conocimiento. (Solo un reto mas xD)
+
+> [!NOTE]
+> Todo lo tratare de documentar. Como todas mis ideas y esto estara en  `/docs/`
+
+**Revisa siempre de primero**
+
+- [apkeditor-ui](url) 
+
+## Compilasion 
+
+```bash
 gradle  fatJar
 ```
 
