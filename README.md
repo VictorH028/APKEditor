@@ -21,7 +21,7 @@ APKEditor Futuristic es una interfaz gráfica moderna  que envuelve el motor ori
 
 **Revisa siempre de primero**
 
-- [apkeditor-ui](url) 
+- [apkeditor-ui](https://github.com/VictorH028/APKEditor/blob/UI/docs/apkeditor-ui.md) 
 
 ## Compilasion 
 
