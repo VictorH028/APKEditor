@@ -13,6 +13,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      APP_VERSION: "1.4.9"
 
     steps:
       - uses: actions/checkout@v7
@@ -26,6 +28,7 @@ jobs:
         run: ./gradlew fatJar
       - uses: actions/upload-artifact@v7
         with:
-          name: APKEditor
-          path: build/libs/*.jar
+          name: APKEditor-${{ env.APP_VERSION }}
+          path: build/libs/APKEditor-${{ env.APP_VERSION }}.jar
           if-no-files-found: error
+          archive: false

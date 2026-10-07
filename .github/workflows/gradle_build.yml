@@ -13,6 +13,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      APP_VERSION: "1.4.9"
 
     steps:
       - uses: actions/checkout@v7
@@ -119,22 +121,25 @@ jobs:
       - name: Upload DEBIAN-DEB-APKEDITOR
         uses: actions/upload-artifact@v7
         with:
-          name: DEBIAN-DEB-APKEDITOR
-          path: artifacts/*.deb
+          name: DEBIAN-DEB-APKEDITOR-${{ env.APP_VERSION }}
+          path: artifacts/apkeditor_${{ env.APP_VERSION }}_all.deb
           if-no-files-found: error
+          archive: false
 
       - name: Upload TERMUX-DEB-APKEDITOR
         uses: actions/upload-artifact@v7
         with:
-          name: TERMUX-DEB-APKEDITOR
-          path: artifacts1/*.deb
+          name: TERMUX-DEB-APKEDITOR-${{ env.APP_VERSION }}
+          path: artifacts1/apkeditor_${{ env.APP_VERSION }}_all.deb
           if-no-files-found: error
+          archive: false
 
-      - name: Upload APKEDITOR.jar 
+      - name: Upload APKEDITOR.jar
         uses: actions/upload-artifact@v7
         with:
-          name: APKEDITOR  
-          path: build/libs/*-all.jar
+          name: APKEDITOR-${{ env.APP_VERSION }}
+          path: build/libs/APKEditor-${{ env.APP_VERSION }}.jar
           if-no-files-found: error
+          archive: false
 
     
