@@ -13,8 +13,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      APP_VERSION: "1.4.9"
 
     steps:
       - uses: actions/checkout@v7
@@ -26,6 +24,9 @@ jobs:
           distribution: 'temurin'
 
       - uses: gradle/actions/setup-gradle@v6
+
+      - name: Resolve app version
+        run: echo "APP_VERSION=$(./gradlew -q properties | awk '/^version:/{print $2}')" >> "$GITHUB_ENV"
 
       - name: Build with Gradle
         run: ./gradlew fatJar --no-daemon # --> Evitar algunos errores  CI 
