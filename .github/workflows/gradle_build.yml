@@ -33,8 +33,8 @@ jobs:
       
       - name: Install dependencies for DEB packaging
         run: |
-          sudo apt-get update
-          sudo apt-get install -y dh-make debhelper devscripts
+          sudo apt-get -o Acquire::Queue-Mode=host update
+          sudo apt-get -o Acquire::Queue-Mode=host install -y dh-make debhelper devscripts
           
       - name: Create DEB package structure DEBIAN
         run: |
