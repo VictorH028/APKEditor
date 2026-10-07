@@ -55,7 +55,7 @@ jobs:
           # Create control file
           cat > deb-package-debian/DEBIAN/control <<EOL
           Package: apkeditor
-          Version: 1.4-${{ github.run_number }}
+          Version: ${{ env.APP_VERSION }}-${{ github.run_number }}
           Section: utils
           Priority: optional
           Architecture: all
@@ -97,7 +97,7 @@ jobs:
           # Create control file
           cat > deb-package-termux/DEBIAN/control <<EOL
           Package: apkeditor
-          Version: 1.4-${{ github.run_number }}
+          Version: ${{ env.APP_VERSION }}-${{ github.run_number }}
           Section: utils
           Priority: optional
           Architecture: all
@@ -112,18 +112,18 @@ jobs:
           #### debian ####
           dpkg-deb --build deb-package-debian
           mkdir -p artifacts
-          mv deb-package-debian.deb artifacts/apkeditor_1.4-${{ github.run_number }}_all.deb 
+          mv deb-package-debian.deb artifacts/apkeditor_${{ env.APP_VERSION }}_${{ github.run_number }}_all.deb 
           #### termux ####
           dpkg-deb --build deb-package-termux
           mkdir -p artifacts1
-          mv deb-package-termux.deb artifacts1/apkeditor_1.4-${{ github.run_number }}_all.deb 
+          mv deb-package-termux.deb artifacts1/apkeditor_${{ env.APP_VERSION }}_${{ github.run_number }}_all.deb 
           
 
       - name: Upload DEBIAN-DEB-APKEDITOR
         uses: actions/upload-artifact@v7
         with:
           name: DEBIAN-DEB-APKEDITOR-${{ env.APP_VERSION }}
-          path: artifacts/apkeditor_${{ env.APP_VERSION }}_all.deb
+          path: artifacts/apkeditor_${{ env.APP_VERSION }}_${{ github.run_number }}_all.deb
           if-no-files-found: error
           archive: false
 
@@ -131,7 +131,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: TERMUX-DEB-APKEDITOR-${{ env.APP_VERSION }}
-          path: artifacts1/apkeditor_${{ env.APP_VERSION }}_all.deb
+          path: artifacts1/apkeditor_${{ env.APP_VERSION }}_${{ github.run_number }}_all.deb
           if-no-files-found: error
           archive: false
 
@@ -139,7 +139,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: APKEDITOR-${{ env.APP_VERSION }}
-          path: build/libs/APKEditor-${{ env.APP_VERSION }}.jar
+          path: build/libs/APKEditor-${{ env.APP_VERSION }}-all.jar
           if-no-files-found: error
           archive: false
 
