@@ -1,5 +1,6 @@
 package com.reandroid.apkeditor.gui.view;
 
+import com.reandroid.apkeditor.Options;
 import com.reandroid.apkeditor.core.*;
 import com.reandroid.apkeditor.gui.components.*;
 import com.reandroid.apkeditor.gui.theme.*;
@@ -12,8 +13,9 @@ import java.util.function.Consumer;
 public final class OperationView extends JPanel {
     private final String operationId;
     private final Operation operation;
-    private final FileSelector input = new FileSelector("INPUT", false);
-    private final FileSelector output = new FileSelector("OUTPUT", true);
+    private final FileSelector input = new FileSelector("INPUT");
+    private final FileSelector output = new FileSelector("OUTPUT");
+    private final OperationOptionsPanel optionsPanel;
     private final LogConsole logs;
     private final ProgressPanel progress;
     private final JButton runButton = new NeonButton("RUN OPERATION");
@@ -24,6 +26,9 @@ public final class OperationView extends JPanel {
                           Consumer<Boolean> busyState) {
         this.operationId = operationId;
         this.operation = operation;
+        this.optionsPanel = operation instanceof LegacyOptionsOperation
+            ? new OperationOptionsPanel(((LegacyOptionsOperation) operation).getOptions())
+            : null;
         this.logs = logs;
         this.progress = progress;
         this.busyState = busyState;
@@ -48,20 +53,33 @@ public final class OperationView extends JPanel {
         form.add(output, c);
 
         c.gridy++;
+        c.fill = GridBagConstraints.BOTH;
+        c.weighty = 1;
+        if (optionsPanel != null) {
+            form.add(optionsPanel, c);
+        }
+
+        c.gridy++;
+        c.weighty = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.WEST;
         runButton.setFont(Fonts.SECTION);
         ((NeonButton) runButton).setAccent(true);
         runButton.addActionListener(e -> run());
         form.add(runButton, c);
 
-        add(form, BorderLayout.CENTER);
+        JScrollPane scroll = new JScrollPane(form);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.getViewport().setBackground(Colors.BACKGROUND);
+        add(scroll, BorderLayout.CENTER);
     }
 
     private void run() {
-        if (!(operation instanceof LegacyOptionsOperation legacy)) {
+        if (!(operation instanceof LegacyOptionsOperation)) {
             logs.append("[ERROR] Unsupported operation adapter: " + operationId);
             return;
         }
+        LegacyOptionsOperation legacy = (LegacyOptionsOperation) operation;
 
         File in = input.getFile();
         File out = output.getFile();
@@ -72,7 +90,10 @@ public final class OperationView extends JPanel {
         }
 
         try {
-            var options = legacy.getOptions();
+            Options options = legacy.getOptions();
+            if (optionsPanel != null) {
+                optionsPanel.applyTo(options);
+            }
             options.inputFile = in;
             if (out != null && operationId.equals("decode")) {
                 options.outputFile = out;

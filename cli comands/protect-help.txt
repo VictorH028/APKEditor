@@ -1,0 +1,30 @@
+Protects/Obfuscates apk resource files. Using unique obfuscation techniques.    
+Options:                                                                        
+  -dex-level            Dex protection level (0-5).                             
+                         0 - Off                                                
+                         1 - Basic                                              
+                         2 - Normal (Not implemented yet)                       
+                         3 - High (Not implemented yet)                         
+                         4 - Max (Not implemented yet)                          
+                         * Default 0                                            
+  -dic-dir-names        Path to a text file containing a list of directory      
+                        names separated by new line.                            
+  -dic-file-names       Path to a text file containing a list of file names     
+                        separated by new line.                                  
+  -i                    Input path.                                             
+  -keep-type            Keep specific resource type names (e.g drawable), By    
+                        default keeps only <font> resource type.                
+                         *Can be multiple                                       
+  -o                    Output path. Optional, if not provided then a new file  
+                        will be generated on same directory as input            
+Flags:                                                                          
+  -confuse-zip          Confuse zip structure. When this turned on:             
+                         * Apps might crash if accessing apk files directly e.g 
+                        Class.getResourceAsStream().                            
+                         * Some apk scanners might flag it as "Malformed zip"   
+  -f                    Force delete output path.                               
+  -h | -help | --help   Displays this help and exit.                            
+  -skip-manifest        Do not protect manifest.                                
+Examples:                                                                       
+  1)  [Basic]                                                                   
+    java -jar APKEditor.jar p -i path/input.apk -o path/output.apk              

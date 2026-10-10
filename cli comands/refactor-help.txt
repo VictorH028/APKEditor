@@ -1,0 +1,16 @@
+Refactors obfuscated resource names                                             
+Options:                                                                        
+  -i                    Input path.                                             
+  -o                    Output path. Optional, if not provided then a new file  
+                        will be generated on same directory as input            
+  -public-xml           Path of resource ids xml file (public.xml)              
+                        Loads names and applies to resources from 'public.xml'  
+                        file                                                    
+Flags:                                                                          
+  -clean-meta           Cleans META-INF directory along with signature block.   
+  -f                    Force delete output path.                               
+  -fix-types            Corrects resource type names based on usages and values 
+  -h | -help | --help   Displays this help and exit.                            
+Examples:                                                                       
+  1)  [Basic]                                                                   
+    java -jar APKEditor.jar x -i path/input.apk -o path/output.apk              

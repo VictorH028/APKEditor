@@ -15,15 +15,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+      - name: Set up JDK 8
+        uses: actions/setup-java@v6
         with:
-          java-version: '21'
+          java-version: '8'
           distribution: 'temurin'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Resolve app version
+        run: echo "APP_VERSION=$(./gradlew -q properties | awk '/^version:/{print $2}')" >> "$GITHUB_ENV"
 
       - name: Build with Gradle
         run: ./gradlew fatJar --no-daemon # --> Evitar algunos errores  CI 
@@ -42,7 +45,7 @@ jobs:
           chmod 755 deb-package-debian 
           
           # Copy the built jar
-          cp build/libs/*.jar deb-package-debian/usr/share/apkeditor/apkeditor.jar
+          cp build/libs/*-all.jar deb-package-debian/usr/share/apkeditor/apkeditor.jar
           
           # Create launcher script
           echo '#!/bin/sh' > deb-package-debian/usr/bin/apkeditor
@@ -52,7 +55,7 @@ jobs:
           # Create control file
           cat > deb-package-debian/DEBIAN/control <<EOL
           Package: apkeditor
-          Version: 1.4-${{ github.run_number }}
+          Version: ${{ env.APP_VERSION }}-${{ github.run_number }}
           Section: utils
           Priority: optional
           Architecture: all
@@ -70,7 +73,7 @@ jobs:
           chmod 755 deb-package-termux 
            
           # Copy the built jar
-          cp build/libs/*.jar deb-package-termux/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar
+          cp build/libs/*-all.jar deb-package-termux/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar
            
           # Create launcher script
           #
@@ -94,7 +97,7 @@ jobs:
           # Create control file
           cat > deb-package-termux/DEBIAN/control <<EOL
           Package: apkeditor
-          Version: 1.4-${{ github.run_number }}
+          Version: ${{ env.APP_VERSION }}-${{ github.run_number }}
           Section: utils
           Priority: optional
           Architecture: all
@@ -109,29 +112,35 @@ jobs:
           #### debian ####
           dpkg-deb --build deb-package-debian
           mkdir -p artifacts
-          mv deb-package-debian.deb artifacts/apkeditor_1.4-${{ github.run_number }}_all.deb 
+          mv deb-package-debian.deb artifacts/apkeditor_${{ env.APP_VERSION }}-debian-${{ github.run_number }}.deb 
           #### termux ####
           dpkg-deb --build deb-package-termux
           mkdir -p artifacts1
-          mv deb-package-termux.deb artifacts1/apkeditor_1.4-${{ github.run_number }}_all.deb 
+          mv deb-package-termux.deb artifacts1/apkeditor_${{ env.APP_VERSION }}-termux-${{ github.run_number }}.deb 
           
 
       - name: Upload DEBIAN-DEB-APKEDITOR
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: DEBIAN-DEB-APKEDITOR 
-          path: artifacts 
+          name: DEBIAN-DEB-APKEDITOR-${{ env.APP_VERSION }}
+          path: artifacts/apkeditor_${{ env.APP_VERSION }}-debian-${{ github.run_number }}.deb
+          if-no-files-found: error
+          archive: false
 
-      - name: Upload TERMUX-DEB-APKEDITOR 
-        uses: actions/upload-artifact@v4 
+      - name: Upload TERMUX-DEB-APKEDITOR
+        uses: actions/upload-artifact@v7
         with:
-          name: TERMUX-DEB-APKEDITOR
-          path: artifacts1
+          name: TERMUX-DEB-APKEDITOR-${{ env.APP_VERSION }}
+          path: artifacts1/apkeditor_${{ env.APP_VERSION }}-termux-${{ github.run_number }}.deb
+          if-no-files-found: error
+          archive: false
 
-      - name: Upload APKEDITOR.jar 
-        uses: actions/upload-artifact@v4
+      - name: Upload APKEDITOR.jar
+        uses: actions/upload-artifact@v7
         with:
-          name: APKEDITOR  
-          path: build/libs  
+          name: APKEDITOR-${{ env.APP_VERSION }}
+          path: build/libs/APKEditor-${{ env.APP_VERSION }}-all.jar
+          if-no-files-found: error
+          archive: false
 
     
