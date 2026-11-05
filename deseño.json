@@ -1,0 +1,630 @@
+
+{
+  "project": {
+    "name": "APKEDITOR",
+    "subtitle": "Reverse Engineering",
+    "version": "1.0.0",
+    "description": "Futuristic Android APK reverse engineering desktop application",
+    "type": "desktop_application",
+    "reference_image": "ui_last.png",
+    "design_goal": "Recreate the reference interface as closely as possible",
+    "language": "es",
+    "framework_preferences": [
+      "JavaFX",
+      "AtlantaFX",
+      "RichTextFX"
+    ]
+  },
+  "canvas": {
+    "width": 1536,
+    "height": 1024,
+    "minimum_width": 1200,
+    "minimum_height": 800,
+    "layout": "desktop_dashboard",
+    "background": "#020B18",
+    "scaling": "responsive"
+  },
+  "design_system": {
+    "theme": "Futuristic",
+    "style": [
+      "Cyberpunk",
+      "Hacker",
+      "Dark UI",
+      "Neon",
+      "Professional developer tools"
+    ],
+    "colors": {
+      "background": "#020B18",
+      "background_secondary": "#041426",
+      "panel": "#06182A",
+      "panel_secondary": "#071D32",
+      "panel_hover": "#0B2945",
+      "border": "#123653",
+      "border_active": "#087FBC",
+      "primary": "#00BFFF",
+      "primary_bright": "#00D5FF",
+      "cyan": "#00E5FF",
+      "green": "#00E6A0",
+      "purple": "#A855F7",
+      "magenta": "#D946EF",
+      "text_primary": "#E6F4FF",
+      "text_secondary": "#9CB4CC",
+      "text_muted": "#64829F",
+      "error": "#FF4668",
+      "warning": "#FFB547"
+    },
+    "effects": {
+      "neon_glow": true,
+      "glassmorphism": false,
+      "subtle_gradients": true,
+      "panel_shadows": true,
+      "border_glow": true,
+      "background_particles": false,
+      "glow_color": "#00BFFF",
+      "glow_intensity": "subtle"
+    },
+    "typography": {
+      "primary_font": "Inter",
+      "monospace_font": "JetBrains Mono",
+      "headings_weight": 600,
+      "body_weight": 400,
+      "code_weight": 400
+    },
+    "shape": {
+      "panel_radius": 12,
+      "button_radius": 6,
+      "input_radius": 8,
+      "border_width": 1,
+      "spacing": 8
+    }
+  },
+  "window": {
+    "title": "APKEDITOR - Reverse Engineering",
+    "custom_titlebar": true,
+    "titlebar_height": 74,
+    "controls": [
+      "minimize",
+      "maximize",
+      "close"
+    ],
+    "topbar": {
+      "logo": "APKEDITOR",
+      "subtitle": "Reverse Engineering",
+      "tagline": "Decode · Build · Analyze",
+      "apk_selector": {
+        "visible": true,
+        "placeholder": "MyApplication.apk",
+        "icon": "file-code",
+        "dropdown": true
+      },
+      "theme_selector": {
+        "visible": true,
+        "default": "Futuristic",
+        "options": [
+          "Futuristic",
+          "Cyberpunk",
+          "Dark",
+          "Midnight"
+        ]
+      }
+    }
+  },
+  "main_layout": {
+    "type": "horizontal_split",
+    "areas": [
+      {
+        "id": "sidebar",
+        "width": 236,
+        "position": "left",
+        "resizable": false
+      },
+      {
+        "id": "workspace",
+        "width": "flex",
+        "position": "center",
+        "resizable": true
+      }
+    ],
+    "workspace": {
+      "type": "grid",
+      "columns": [
+        "minmax(260px, 1fr)",
+        "minmax(400px, 1.5fr)",
+        "minmax(300px, 1fr)"
+      ],
+      "rows": [
+        "minmax(620px, 1fr)",
+        "175px"
+      ],
+      "gap": 14
+    }
+  },
+  "sidebar": {
+    "logo": {
+      "text": "APKEDITOR",
+      "subtitle": "v1.0.0",
+      "description": "Reverse engineering en tus manos",
+      "position": "bottom",
+      "icon": "custom_neon_logo"
+    },
+    "navigation": [
+      {
+        "id": "dashboard",
+        "label": "Dashboard",
+        "icon": "house"
+      },
+      {
+        "id": "decompile",
+        "label": "Descompilar",
+        "icon": "file-code",
+        "active": true
+      },
+      {
+        "id": "analyze",
+        "label": "Analizar",
+        "icon": "scan-search"
+      },
+      {
+        "id": "smali_viewer",
+        "label": "Smali Viewer",
+        "icon": "binary"
+      },
+      {
+        "id": "build",
+        "label": "Build",
+        "icon": "package"
+      },
+      {
+        "id": "merge",
+        "label": "Merge",
+        "icon": "git-merge"
+      },
+      {
+        "id": "refactor",
+        "label": "Refactor",
+        "icon": "workflow"
+      },
+      {
+        "id": "protect",
+        "label": "Proteger",
+        "icon": "shield"
+      },
+      {
+        "id": "information",
+        "label": "Información",
+        "icon": "info"
+      },
+      {
+        "id": "settings",
+        "label": "Configuración",
+        "icon": "settings"
+      }
+    ],
+    "active_item": {
+      "background": "#07304C",
+      "text_color": "#00D5FF",
+      "left_indicator": "#00D5FF",
+      "glow": true
+    }
+  },
+  "decompile_workspace": {
+    "title": "Descompilación y Análisis",
+    "header_actions": [
+      "search",
+      "close"
+    ],
+    "tabs": [
+      "Estructura",
+      "Código",
+      "Manifest",
+      "Recursos",
+      "Recursos",
+      "Análisis"
+    ],
+    "active_tab": "Estructura",
+    "panels": [
+      {
+        "id": "file_explorer",
+        "title": "Árbol de la aplicación",
+        "width": 278,
+        "position": "left",
+        "components": {
+          "search_input": {
+            "placeholder": "Buscar archivo o carpeta...",
+            "icon": "search"
+          },
+          "file_tree": {
+            "expandable": true,
+            "show_file_icons": true,
+            "show_folder_icons": true,
+            "highlight_selected_file": true,
+            "example_structure": [
+              {
+                "name": "app-debug.apk",
+                "type": "archive",
+                "children": [
+                  {
+                    "name": "META-INF",
+                    "type": "folder"
+                  },
+                  {
+                    "name": "res",
+                    "type": "folder",
+                    "children": [
+                      "layout",
+                      "values",
+                      "drawable",
+                      "mipmap"
+                    ]
+                  },
+                  {
+                    "name": "smali",
+                    "type": "folder",
+                    "children": [
+                      {
+                        "name": "com",
+                        "children": [
+                          {
+                            "name": "example",
+                            "children": [
+                              {
+                                "name": "myapp",
+                                "children": [
+                                  "MainActivity.smali",
+                                  "Utils.smali",
+                                  "BuildConfig.smali"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "smali_classes2",
+                  "assets",
+                  {
+                    "name": "lib",
+                    "children": [
+                      "armeabi-v7a",
+                      "x86"
+                    ]
+                  },
+                  "AndroidManifest.xml",
+                  "resources.arsc"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "code_editor",
+        "title": "MainActivity.smali",
+        "position": "center",
+        "flex": 1,
+        "components": {
+          "editor": {
+            "type": "code_editor",
+            "language": "smali",
+            "line_numbers": true,
+            "syntax_highlighting": true,
+            "current_line_highlight": true,
+            "word_wrap": false,
+            "minimap": false,
+            "scrollbar": true,
+            "font": "JetBrains Mono",
+            "font_size": 13,
+            "editable": true,
+            "tabs": true,
+            "sample_code": [
+              ".class public Lcom/example/myapp/MainActivity;",
+              ".super Landroidx/appcompat/app/AppCompatActivity;",
+              ".source \"MainActivity.java\"",
+              "",
+              "# direct methods",
+              ".method public constructor <init>()V",
+              "    .locals 0",
+              "    .line 12",
+              "    invoke-direct {p0}, Landroidx/appcompat/app/AppCompatActivity;-><init>()V",
+              "    return-void",
+              ".end method",
+              "",
+              "# virtual methods",
+              ".method protected onCreate(Landroid/os/Bundle;)V",
+              "    .locals 2",
+              "    .line 18",
+              "    invoke-super {p0, p1}, Landroidx/appcompat/app/AppCompatActivity;->onCreate(Landroid/os/Bundle;)V",
+              "    return-void",
+              ".end method"
+            ]
+          },
+          "statusbar": {
+            "left": [
+              "Ln 1, Col 1"
+            ],
+            "right": [
+              "Spaces: 4",
+              "UTF-8",
+              "Smali"
+            ]
+          },
+          "toolbar": [
+            "search",
+            "copy",
+            "editor_options"
+          ]
+        }
+      },
+      {
+        "id": "log_panel",
+        "title": "Panel de Log",
+        "position": "right",
+        "width": 390,
+        "components": {
+          "toolbar": [
+            {
+              "id": "clear",
+              "label": "Limpiar",
+              "icon": "trash"
+            },
+            {
+              "id": "export",
+              "label": "Exportar",
+              "icon": "download"
+            }
+          ],
+          "log_view": {
+            "timestamp": true,
+            "icons": true,
+            "colored_messages": true,
+            "auto_scroll": true,
+            "sample_messages": [
+              {
+                "time": "12:34:01",
+                "level": "info",
+                "message": "Estableciendo entorno de trabajo..."
+              },
+              {
+                "time": "12:34:02",
+                "level": "info",
+                "message": "Cargando APK: MyApplication.apk"
+              },
+              {
+                "time": "12:34:03",
+                "level": "info",
+                "message": "Verificando estructura del archivo..."
+              },
+              {
+                "time": "12:34:04",
+                "level": "info",
+                "message": "Descompilación iniciada..."
+              },
+              {
+                "time": "12:34:06",
+                "level": "info",
+                "message": "Extrayendo recursos..."
+              },
+              {
+                "time": "12:34:08",
+                "level": "info",
+                "message": "Generando código smali..."
+              },
+              {
+                "time": "12:34:12",
+                "level": "info",
+                "message": "Analizando manifest..."
+              },
+              {
+                "time": "12:34:14",
+                "level": "info",
+                "message": "Procesando librerías..."
+              },
+              {
+                "time": "12:34:16",
+                "level": "success",
+                "message": "Descompilación completada."
+              },
+              {
+                "time": "12:34:20",
+                "level": "info",
+                "message": "Iniciando análisis de la aplicación..."
+              },
+              {
+                "time": "12:34:24",
+                "level": "info",
+                "message": "Analizando permisos..."
+              },
+              {
+                "time": "12:34:26",
+                "level": "info",
+                "message": "Detectando componentes..."
+              },
+              {
+                "time": "12:34:28",
+                "level": "info",
+                "message": "Revisando vulnerabilidades..."
+              },
+              {
+                "time": "12:34:31",
+                "level": "success",
+                "message": "Análisis completado."
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "bottom_panels": [
+    {
+      "id": "progress_panel",
+      "title": "Descompilando y Analizando APK",
+      "width": "55%",
+      "components": {
+        "description": "Extrayendo recursos, generando código smali y analizando la aplicación...",
+        "progress_bar": {
+          "value": 68,
+          "show_percentage": true,
+          "animated": true,
+          "color": "#00BFFF"
+        },
+        "steps": [
+          {
+            "name": "Cargando APK",
+            "status": "completed"
+          },
+          {
+            "name": "Descompilación",
+            "status": "completed"
+          },
+          {
+            "name": "Análisis",
+            "status": "completed"
+          },
+          {
+            "name": "Generando reporte",
+            "status": "pending"
+          }
+        ]
+      }
+    },
+    {
+      "id": "application_information",
+      "title": "Información de la aplicación",
+      "width": "25%",
+      "components": {
+        "icon": "android",
+        "fields": [
+          {
+            "label": "Nombre",
+            "value": "MyApplication"
+          },
+          {
+            "label": "Versión",
+            "value": "1.0.0"
+          },
+          {
+            "label": "Package",
+            "value": "com.example.myapp"
+          },
+          {
+            "label": "Min SDK",
+            "value": 21
+          },
+          {
+            "label": "Target SDK",
+            "value": 34
+          }
+        ]
+      }
+    },
+    {
+      "id": "statistics",
+      "title": "Estadísticas",
+      "width": "20%",
+      "components": {
+        "fields": [
+          {
+            "label": "Archivos Smali",
+            "value": 342,
+            "icon": "file-code"
+          },
+          {
+            "label": "Clases",
+            "value": 128,
+            "icon": "layers"
+          },
+          {
+            "label": "Recursos",
+            "value": 56,
+            "icon": "folder"
+          },
+          {
+            "label": "Permisos",
+            "value": 8,
+            "icon": "shield"
+          },
+          {
+            "label": "Componentes",
+            "value": 5,
+            "icon": "blocks"
+          }
+        ]
+      }
+    }
+  ],
+  "statusbar": {
+    "position": "bottom",
+    "height": 48,
+    "items": [
+      {
+        "id": "system_status",
+        "label": "Sistema listo",
+        "status": "online",
+        "color": "#00E6A0"
+      },
+      {
+        "id": "memory",
+        "label": "Memoria: 412 MB / 1.8 GB"
+      },
+      {
+        "id": "memory_usage",
+        "type": "progress_bar"
+      }
+    ],
+    "footer_text": "ANALIZA  //  DESCOMPILA  //  EXPLORA  //  CREA"
+  },
+  "interactions": {
+    "sidebar_navigation": true,
+    "file_tree_expand_collapse": true,
+    "file_selection": true,
+    "open_file_in_editor": true,
+    "editor_syntax_highlighting": true,
+    "editor_tabs": true,
+    "search_files": true,
+    "search_code": true,
+    "clear_logs": true,
+    "export_logs": true,
+    "theme_switching": true,
+    "apk_selection": true,
+    "resizable_panels": true,
+    "progress_updates": true
+  },
+  "implementation_requirements": {
+    "architecture": "modular_component_based",
+    "separate_ui_from_business_logic": true,
+    "reusable_components": true,
+    "responsive_layout": true,
+    "real_functionality": true,
+    "avoid_static_mockups": true,
+    "use_custom_css_or_javafx_stylesheets": true,
+    "smooth_animations": true,
+    "keyboard_shortcuts": true,
+    "preserve_panel_state": true,
+    "error_handling": true
+  },
+  "final_instructions": {
+    "priority": [
+      "Visual fidelity to reference image",
+      "Correct component positioning",
+      "Consistent neon color palette",
+      "Professional code editor",
+      "Functional file explorer",
+      "Functional log panel",
+      "Modular architecture"
+    ],
+    "important": [
+      "Do not simplify the interface.",
+      "Do not replace the dashboard with a generic template.",
+      "Preserve the three-column workspace.",
+      "Maintain the left navigation sidebar.",
+      "Maintain the bottom information panels.",
+      "Reproduce the dark futuristic aesthetic.",
+      "Use real icons instead of emoji.",
+      "Use realistic spacing and proportions.",
+      "Implement functional interactions, not just visual elements."
+    ]
+  }
+}
+

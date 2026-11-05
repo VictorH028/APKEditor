@@ -2,12 +2,15 @@ package com.reandroid.apkeditor.gui.navigation;
 
 public enum Route {
     DASHBOARD,
-    DECODE,
+    DECOMPILE,
+    ANALYZE,
+    SMALI_VIEWER,
     BUILD,
     MERGE,
     REFACTOR,
     PROTECT,
-    INFO,
+    INFORMATION,
     LOGS,
-    SETTINGS
+    SETTINGS,
+    DECODE
 }
