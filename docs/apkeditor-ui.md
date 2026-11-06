@@ -46,7 +46,13 @@ Compilación completa sin pruebas:
 sh gradlew build -x test --offline
 ```
 
-Empaquetado con dependencias:
+Jar ejecutable de la GUI con dependencias:
+
+```bash
+sh gradlew guiFatJar --offline
+```
+
+Fat jar general (CLI + GUI):
 
 ```bash
 sh gradlew fatJar --offline
@@ -58,7 +64,8 @@ Artefactos generados:
 build/classes/java/main/                  clases compiladas
 build/resources/main/                     recursos
 build/libs/APKEditor-1.4.9.jar            jar normal
-build/libs/APKEditor-1.4.9-all.jar        fat jar con dependencias
+build/libs/APKEditor-1.4.9-all.jar        fat jar general
+build/libs/APKEditor-1.4.9-gui.jar        jar ejecutable de la GUI
 ```
 
 > Usa `sh gradlew` si `./gradlew` falla con `permission denied`.
@@ -107,7 +114,15 @@ java -cp 'build/classes/java/main:build/resources/main:libs/*' \
   com.reandroid.apkeditor.gui.GUIApplication
 ```
 
-### 4.4 Desde el fat jar
+### 4.4 Desde el jar de la GUI
+
+```bash
+sh gradlew guiFatJar --offline
+
+java -jar build/libs/APKEditor-1.4.9-gui.jar
+```
+
+El fat jar general también contiene la GUI, pero su entrada por defecto es el CLI:
 
 ```bash
 sh gradlew fatJar --offline
@@ -116,7 +131,7 @@ java -cp build/libs/APKEditor-1.4.9-all.jar \
   com.reandroid.apkeditor.gui.GUIApplication
 ```
 
-> Importante: `java -jar` y `sh gradlew run` ejecutan el **CLI** (`com.reandroid.apkeditor.Main`), no la GUI. Para abrir la interfaz hay que indicar explícitamente `com.reandroid.apkeditor.gui.GUIApplication`.
+> Importante: `sh gradlew run` ejecuta el **CLI** (`com.reandroid.apkeditor.Main`), no la GUI. Usa `guiFatJar` y `java -jar build/libs/APKEditor-1.4.9-gui.jar` para abrir la interfaz.
 
 ## 5. Estructura de la ventana
 
@@ -501,7 +516,7 @@ Pendiente o limitado:
 - [Especificación visual](../deseño.json)
 - [Referencia visual](../.img/ui_last.png)
 - [Repositorio APKEditor](https://github.com/VictorH028/APKEditor)
-- `build.gradle`: dependencias, versión y tarea `fatJar`
+- `build.gradle`: dependencias, versión y tareas `fatJar` / `guiFatJar`
 - `src/main/java/com/reandroid/apkeditor/gui/`: implementación de la interfaz
 - `src/main/java/com/reandroid/apkeditor/core/`: contratos del motor
 - `src/main/java/com/reandroid/apkeditor/operations/OperationCatalog.java`: registro de operaciones

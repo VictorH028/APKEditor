@@ -45,13 +45,23 @@ Compilación completa sin pruebas:
 sh gradlew build -x test --offline
 ```
 
-Fat jar con dependencias:
+Jar ejecutable de la interfaz gráfica:
+
+```bash
+sh gradlew guiFatJar --offline
+```
+
+El jar de la GUI se genera en:
+
+```text
+build/libs/APKEditor-1.4.9-gui.jar
+```
+
+También existe el fat jar general (CLI + GUI):
 
 ```bash
 sh gradlew fatJar --offline
 ```
-
-El fat jar se genera en:
 
 ```text
 build/libs/APKEditor-1.4.9-all.jar
@@ -70,13 +80,12 @@ java -cp 'build/classes/java/main:build/resources/main:libs/*' \
   com.reandroid.apkeditor.gui.GUIApplication
 ```
 
-### Opción 2 - Fat jar
+### Opción 2 - Jar de la GUI
 
 ```bash
-sh gradlew fatJar --offline
+sh gradlew guiFatJar --offline
 
-java -cp build/libs/APKEditor-1.4.9-all.jar \
-  com.reandroid.apkeditor.gui.GUIApplication
+java -jar build/libs/APKEditor-1.4.9-gui.jar
 ```
 
 ### Termux con VNC
@@ -102,7 +111,7 @@ termux-x11 :0 &
 
 Abre la aplicación Termux:X11 y ejecuta el comando Java de la GUI.
 
-> Importante: `sh gradlew run` ejecuta el CLI (`com.reandroid.apkeditor.Main`), no la interfaz gráfica. Para abrir la GUI hay que indicar `com.reandroid.apkeditor.gui.GUIApplication`.
+> Importante: `sh gradlew run` ejecuta el CLI (`com.reandroid.apkeditor.Main`), no la interfaz gráfica. Usa `guiFatJar` y `java -jar build/libs/APKEditor-1.4.9-gui.jar` para abrir la GUI.
 
 ## Uso rápido
 

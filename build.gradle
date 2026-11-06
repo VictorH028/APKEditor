@@ -59,3 +59,17 @@ task fatJar(type: Jar) {
     with jar
 }
 
+task guiFatJar(type: Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveClassifier = 'gui'
+
+    manifest {
+        attributes 'Main-Class': 'com.reandroid.apkeditor.gui.GUIApplication'
+    }
+
+    from sourceSets.main.output
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
