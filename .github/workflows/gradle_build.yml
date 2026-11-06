@@ -1,11 +1,11 @@
-name: Build Jar and DEB 
+name: Build Jar and DEB
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "UI" ]
   pull_request:
-    branches: [ "master" ]
-  workflow_dispatch: # ---> Para ejecutar desde la interfaz 
+    branches: [ "master", "UI" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,6 +13,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      PACKAGE_VERSION: "1.4.9-${{ github.run_number }}"
 
     steps:
       - uses: actions/checkout@v4
@@ -26,112 +29,143 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle
-        run: ./gradlew fatJar --no-daemon # --> Evitar algunos errores  CI 
-      
+        run: |
+          chmod +x gradlew
+          ./gradlew clean fatJar --no-daemon
+
+      - name: Prepare fat jar
+        run: |
+          JAR=$(find build/libs -maxdepth 1 -name '*-all.jar' -print -quit)
+          if [ -z "$JAR" ]; then
+            echo "No se encontró el fat jar en build/libs" >&2
+            exit 1
+          fi
+          cp "$JAR" build/libs/apkeditor.jar
+          ls -lh build/libs
+
       - name: Install dependencies for DEB packaging
         run: |
           sudo apt-get update
-          sudo apt-get install -y dh-make debhelper devscripts
-          
+          sudo apt-get install -y dpkg-dev
+
       - name: Create DEB package structure DEBIAN
         run: |
-          ################ DEBIAN #####################
+          set -e
           mkdir -p deb-package-debian/usr/share/apkeditor
           mkdir -p deb-package-debian/usr/bin
           mkdir -p deb-package-debian/DEBIAN
-          chmod 755 deb-package-debian 
-          
-          # Copy the built jar
-          cp build/libs/*.jar deb-package-debian/usr/share/apkeditor/apkeditor.jar
-          
-          # Create launcher script
-          echo '#!/bin/sh' > deb-package-debian/usr/bin/apkeditor
-          echo 'java -jar /usr/share/apkeditor/apkeditor.jar "$@"' >> deb-package-debian/usr/bin/apkeditor
+          chmod 755 deb-package-debian deb-package-debian/DEBIAN
+
+          cp build/libs/apkeditor.jar deb-package-debian/usr/share/apkeditor/apkeditor.jar
+
+          cat > deb-package-debian/usr/bin/apkeditor <<'EOF'
+          #!/bin/sh
+          exec java ${JAVA_OPTS:-} -cp /usr/share/apkeditor/apkeditor.jar com.reandroid.apkeditor.Main "$@"
+          EOF
           chmod +x deb-package-debian/usr/bin/apkeditor
-          
-          # Create control file
-          cat > deb-package-debian/DEBIAN/control <<EOL
+
+          cat > deb-package-debian/usr/bin/apkeditor-gui <<'EOF'
+          #!/bin/sh
+          if [ -z "${DISPLAY:-}" ]; then
+            echo "Error: DISPLAY no está definido. Inicia un servidor X11 o VNC." >&2
+            exit 1
+          fi
+          exec java ${JAVA_OPTS:-} -cp /usr/share/apkeditor/apkeditor.jar com.reandroid.apkeditor.gui.GUIApplication "$@"
+          EOF
+          chmod +x deb-package-debian/usr/bin/apkeditor-gui
+
+          cat > deb-package-debian/DEBIAN/control <<EOF
           Package: apkeditor
-          Version: 1.4-${{ github.run_number }}
+          Version: ${PACKAGE_VERSION}
           Section: utils
           Priority: optional
           Architecture: all
           Maintainer: VictorH028 <t.me/demonr_rip>
-          Description: APK Editor tool
-           A tool for editing APK files.
-          EOL
+          Description: APKEditor CLI and graphical interface
+           APKEditor is a tool for editing APK files.
+           It includes the command-line interface and the Swing GUI.
+          EOF
+          chmod -R a+rX deb-package-debian
 
       - name: Create DEB package structure TERMUX
         run: |
-          ############## TERMUX ###############
-          mkdir -p deb-package-termux/data/data/com.termux/files/usr/share/apkeditor
-          mkdir -p deb-package-termux/data/data/com.termux/files/usr/bin
+          set -e
+          TERMUX_PREFIX=deb-package-termux/data/data/com.termux/files/usr
+          mkdir -p "$TERMUX_PREFIX/share/apkeditor"
+          mkdir -p "$TERMUX_PREFIX/bin"
           mkdir -p deb-package-termux/DEBIAN
-          chmod 755 deb-package-termux 
-           
-          # Copy the built jar
-          cp build/libs/*.jar deb-package-termux/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar
-           
-          # Create launcher script
-          #
-          cat > deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor << 'EOF'
+          chmod 755 deb-package-termux deb-package-termux/DEBIAN
+
+          cp build/libs/apkeditor.jar "$TERMUX_PREFIX/share/apkeditor/apkeditor.jar"
+
+          cat > "$TERMUX_PREFIX/bin/apkeditor" <<'EOF'
           #!/data/data/com.termux/files/usr/bin/bash
-          
-          JAR_PATH="/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar" 
+          set -e
+          JAR_PATH="/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar"
           if [ ! -f "$JAR_PATH" ]; then
-                  echo "Error: I can't find  apkeditor.jar en $JAR_PATH" >&2
-                  exit 1
+            echo "Error: no se encontró apkeditor.jar en $JAR_PATH" >&2
+            exit 1
           fi
-
-          JAVA_OPTS="-Xmx512M "
-
-          exec java -jar $JAVA_OPTS "$JAR_PATH" "$@"
+          JAVA_OPTS="${JAVA_OPTS:--Xmx512M}"
+          exec java $JAVA_OPTS -cp "$JAR_PATH" com.reandroid.apkeditor.Main "$@"
           EOF
-          
-          
-          chmod +x deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor 
-          
-          # Create control file
-          cat > deb-package-termux/DEBIAN/control <<EOL
+          chmod +x "$TERMUX_PREFIX/bin/apkeditor"
+
+          cat > "$TERMUX_PREFIX/bin/apkeditor-gui" <<'EOF'
+          #!/data/data/com.termux/files/usr/bin/bash
+          set -e
+          JAR_PATH="/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar"
+          if [ ! -f "$JAR_PATH" ]; then
+            echo "Error: no se encontró apkeditor.jar en $JAR_PATH" >&2
+            exit 1
+          fi
+          if [ -z "${DISPLAY:-}" ]; then
+            echo "Error: DISPLAY no está definido. Inicia VNC o Termux:X11 y exporta DISPLAY." >&2
+            exit 1
+          fi
+          JAVA_OPTS="${JAVA_OPTS:--Xmx512M}"
+          exec java $JAVA_OPTS -cp "$JAR_PATH" com.reandroid.apkeditor.gui.GUIApplication "$@"
+          EOF
+          chmod +x "$TERMUX_PREFIX/bin/apkeditor-gui"
+
+          cat > deb-package-termux/DEBIAN/control <<EOF
           Package: apkeditor
-          Version: 1.4-${{ github.run_number }}
+          Version: ${PACKAGE_VERSION}
           Section: utils
           Priority: optional
           Architecture: all
           Maintainer: VictorH028 <t.me/demonr_rip>
-          Description: APK Editor tool
-           A tool for editing APK files.
-          EOL
+          Description: APKEditor CLI and graphical interface
+           APKEditor is a tool for editing APK files.
+           It includes the command-line interface and the Swing GUI.
+          EOF
+          chmod -R a+rX deb-package-termux
 
-
-      - name: Build DEB package
+      - name: Build DEB packages
         run: |
-          #### debian ####
-          dpkg-deb --build deb-package-debian
-          mkdir -p artifacts
-          mv deb-package-debian.deb artifacts/apkeditor_1.4-${{ github.run_number }}_all.deb 
-          #### termux ####
-          dpkg-deb --build deb-package-termux
-          mkdir -p artifacts1
-          mv deb-package-termux.deb artifacts1/apkeditor_1.4-${{ github.run_number }}_all.deb 
-          
+          set -e
+          mkdir -p artifacts artifacts1
+          dpkg-deb --build deb-package-debian "artifacts/apkeditor_${PACKAGE_VERSION}_all.deb"
+          dpkg-deb --build deb-package-termux "artifacts1/apkeditor_${PACKAGE_VERSION}_all.deb"
+          ls -lh artifacts artifacts1
 
       - name: Upload DEBIAN-DEB-APKEDITOR
         uses: actions/upload-artifact@v4
         with:
-          name: DEBIAN-DEB-APKEDITOR 
-          path: artifacts 
+          name: DEBIAN-DEB-APKEDITOR
+          path: artifacts/*.deb
+          if-no-files-found: error
 
-      - name: Upload TERMUX-DEB-APKEDITOR 
-        uses: actions/upload-artifact@v4 
-        with:
-          name: TERMUX-DEB-APKEDITOR
-          path: artifacts1
-
-      - name: Upload APKEDITOR.jar 
+      - name: Upload TERMUX-DEB-APKEDITOR
         uses: actions/upload-artifact@v4
         with:
-          name: APKEDITOR  
-          path: build/libs  
+          name: TERMUX-DEB-APKEDITOR
+          path: artifacts1/*.deb
+          if-no-files-found: error
 
-    
+      - name: Upload APKEDITOR.jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: APKEDITOR
+          path: build/libs/apkeditor.jar
+          if-no-files-found: error
