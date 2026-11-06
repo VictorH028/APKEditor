@@ -2,6 +2,7 @@ package com.reandroid.apkeditor.gui.view;
 
 import com.reandroid.apkeditor.gui.components.NeonButton;
 import com.reandroid.apkeditor.gui.editor.EditorTabs;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.log.LogPanel;
 import com.reandroid.apkeditor.gui.model.AppState;
 import com.reandroid.apkeditor.gui.model.ApkAnalysis;
@@ -31,6 +32,12 @@ import java.util.function.Consumer;
  * logs, progreso, información y estadísticas.
  */
 public final class DecompileView extends JPanel {
+    private static final String TAB_STRUCTURE = "structure";
+    private static final String TAB_CODE = "code";
+    private static final String TAB_MANIFEST = "manifest";
+    private static final String TAB_RESOURCES = "resources";
+    private static final String TAB_ANALYSIS = "analysis";
+
     private final AppState state;
     private final OperationService operations;
     private final LogService logService;
@@ -94,14 +101,14 @@ public final class DecompileView extends JPanel {
         state.addPropertyChangeListener(AppState.ANALYSIS_CHANGED, analysisListener);
         state.addPropertyChangeListener(AppState.INPUT_CHANGED, inputListener);
         updateSubtitle();
-        setActiveTab("Estructura");
+        setActiveTab(TAB_STRUCTURE);
     }
 
     private JComponent createHeader() {
         JPanel container = new JPanel(new BorderLayout(0, 10));
         container.setOpaque(false);
 
-        JLabel title = new JLabel("Descompilación y Análisis");
+        JLabel title = new JLabel(I18n.t("decompile.title"));
         title.setFont(Fonts.TITLE);
         title.setForeground(Colors.TEXT);
         subtitle.setFont(Fonts.SMALL);
@@ -115,16 +122,16 @@ public final class DecompileView extends JPanel {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 7, 0));
         actions.setOpaque(false);
 
-        NeonButton search = headerButton("search", "Buscar archivos (Ctrl+F)");
+        NeonButton search = headerButton("search", I18n.t("decompile.searchTooltip"));
         search.addActionListener(e -> explorer.focusSearch());
-        NeonButton close = headerButton("close", "Restablecer espacio de trabajo");
+        NeonButton close = headerButton("close", I18n.t("decompile.resetTooltip"));
         close.addActionListener(e -> resetWorkspace());
 
-        NeonButton run = new NeonButton("Descompilar",
+        NeonButton run = new NeonButton(I18n.t("decompile.run"),
                 IconFactory.icon("play", 13, Colors.BACKGROUND));
         run.setVariant(NeonButton.Variant.PRIMARY);
         run.setFont(Fonts.BODY_MEDIUM);
-        run.setToolTipText("Iniciar descompilación (F5)");
+        run.setToolTipText(I18n.t("decompile.runTooltip"));
         run.addActionListener(e -> runDecompile());
 
         actions.add(search);
@@ -137,9 +144,16 @@ public final class DecompileView extends JPanel {
         header.add(actions, BorderLayout.EAST);
 
         tabsPanel.setOpaque(false);
-        for (String name : new String[]{"Estructura", "Código", "Manifest", "Recursos", "Análisis"}) {
-            WorkspaceTab tab = new WorkspaceTab(name);
-            tab.addActionListener(e -> onTab(name));
+        String[][] tabDefinitions = {
+                {TAB_STRUCTURE, "tab.structure"},
+                {TAB_CODE, "tab.code"},
+                {TAB_MANIFEST, "tab.manifest"},
+                {TAB_RESOURCES, "tab.resources"},
+                {TAB_ANALYSIS, "tab.analysis"}
+        };
+        for (String[] definition : tabDefinitions) {
+            WorkspaceTab tab = new WorkspaceTab(definition[0], I18n.t(definition[1]));
+            tab.addActionListener(e -> onTab(definition[0]));
             tabs.add(tab);
             tabsPanel.add(tab);
         }
@@ -217,40 +231,40 @@ public final class DecompileView extends JPanel {
         return split;
     }
 
-    private void onTab(String name) {
-        setActiveTab(name);
-        switch (name) {
-            case "Estructura" -> {
+    private void onTab(String id) {
+        setActiveTab(id);
+        switch (id) {
+            case TAB_STRUCTURE -> {
                 explorer.getTree().requestFocusInWindow();
                 if (state.getSelectedFilePath() != null) {
                     explorer.selectPath(state.getSelectedFilePath());
                 }
             }
-            case "Código" -> {
+            case TAB_CODE -> {
                 if (editor.getActiveEditor() == null) {
                     openSampleFile();
                 } else {
                     editor.getActiveEditor().getTextPane().requestFocusInWindow();
                 }
             }
-            case "Manifest" -> openNamed("AndroidManifest.xml");
-            case "Recursos" -> {
+            case TAB_MANIFEST -> openNamed("AndroidManifest.xml");
+            case TAB_RESOURCES -> {
                 if (!openNamed("strings.xml")) {
                     if (!openNamed("resources.arsc")) {
-                        logService.info("No se encontraron recursos en el árbol actual.");
+                        logService.info(I18n.t("decompile.resourcesNotFound"));
                     }
                 }
             }
-            case "Análisis" -> openAnalysisReport();
+            case TAB_ANALYSIS -> openAnalysisReport();
             default -> {
             }
         }
     }
 
-    private void setActiveTab(String name) {
+    private void setActiveTab(String id) {
         for (WorkspaceTab tab : tabs) {
-            tab.setActive(tab.getText().equals(name));
-            if (tab.getText().equals(name)) {
+            tab.setActive(tab.getTabId().equals(id));
+            if (tab.getTabId().equals(id)) {
                 activeTab = tab;
             }
         }
@@ -258,18 +272,18 @@ public final class DecompileView extends JPanel {
     }
 
     public void showEditor() {
-        setActiveTab("Código");
-        onTab("Código");
+        setActiveTab(TAB_CODE);
+        onTab(TAB_CODE);
     }
 
     public void showStructure() {
-        setActiveTab("Estructura");
-        onTab("Estructura");
+        setActiveTab(TAB_STRUCTURE);
+        onTab(TAB_STRUCTURE);
     }
 
     public void showAnalysis() {
-        setActiveTab("Análisis");
-        onTab("Análisis");
+        setActiveTab(TAB_ANALYSIS);
+        onTab(TAB_ANALYSIS);
     }
 
     public EditorTabs getEditorTabs() {
@@ -320,7 +334,7 @@ public final class DecompileView extends JPanel {
         if (node == null || node.isContainer()) {
             return;
         }
-        setActiveTab("Código");
+        setActiveTab(TAB_CODE);
         if (node.getContent() != null) {
             editor.open(new SourceFile(node.getName(), node.getSourcePath(),
                     node.getContent(), languageOf(node), node.isBinary()));
@@ -329,7 +343,7 @@ public final class DecompileView extends JPanel {
         File source = state.getCurrentInput();
         if (source == null || node.getSourcePath() == null) {
             String message = "; " + node.getSourcePath() + "\n"
-                    + "; Archivo binario / sin contenido de texto disponible.\n";
+                    + I18n.t("decompile.binaryPlaceholder") + "\n";
             editor.open(new SourceFile(node.getName(), node.getSourcePath(),
                     message, "hex", node.isBinary()));
             return;
@@ -345,14 +359,15 @@ public final class DecompileView extends JPanel {
                 try {
                     SourceFile file = get();
                     if (file == null) {
-                        logService.warning("No se pudo abrir: " + node.getSourcePath());
+                        logService.warning(I18n.t("decompile.openFailed",
+                                node.getSourcePath()));
                         return;
                     }
                     editor.open(file);
                     explorer.selectPath(node.getSourcePath());
                 } catch (Exception error) {
-                    logService.error("Error al leer " + node.getName() + ": "
-                            + error.getMessage());
+                    logService.error(I18n.t("decompile.readError",
+                            node.getName(), error.getMessage()));
                 }
             }
         }.execute();
@@ -361,41 +376,47 @@ public final class DecompileView extends JPanel {
     private void openAnalysisReport() {
         ApkAnalysis analysis = state.getAnalysis();
         String content = """
-                APKEDITOR :: REPORTE DE ANÁLISIS
+                %s
                 =========================================
-                Aplicación      : %s
-                Paquete         : %s
-                Versión         : %s (code %d)
-                Min SDK         : %d
-                Target SDK      : %d
-                Tamaño APK      : %s
-                Archivos        : %d
-                Archivos Smali  : %d
-                Clases          : %d
-                Recursos        : %d
-                Permisos        : %d
-                Componentes     : %d
+                %s: %s
+                %s: %s
+                %s: %s
+                %s: %s
+                %s: %s
+                %s: %s
+                %s: %s
+                %s: %s
+                %s: %s
+                %s: %s
+                %s: %s
+                %s: %s
 
-                Estado del motor
+                %s
                 -----------------------------------------
-                Entorno         : listo
-                Motor           : APKEditor core
-                Interfaz        : Futuristic neon UI
-                Editor          : Smali syntax highlighting
+                %s: %s
+                %s: APKEditor core
+                %s: %s
+                %s: %s
                 """.formatted(
-                analysis.getAppName(),
-                analysis.getPackageName(),
-                analysis.getVersionName(),
-                analysis.getVersionCode(),
-                analysis.getMinSdk(),
-                analysis.getTargetSdk(),
-                analysis.getSizeLabel(),
-                analysis.getFileCount(),
-                analysis.getSmaliFiles(),
-                analysis.getClasses(),
-                analysis.getResources(),
-                analysis.getPermissions(),
-                analysis.getComponents());
+                I18n.t("report.title"),
+                I18n.t("report.application"), analysis.getAppName(),
+                I18n.t("report.package"), analysis.getPackageName(),
+                I18n.t("report.version"), I18n.t("report.versionFormat",
+                        analysis.getVersionName(), analysis.getVersionCode()),
+                I18n.t("report.minSdk"), analysis.getMinSdk(),
+                I18n.t("report.targetSdk"), analysis.getTargetSdk(),
+                I18n.t("report.apkSize"), analysis.getSizeLabel(),
+                I18n.t("report.files"), analysis.getFileCount(),
+                I18n.t("report.smaliFiles"), analysis.getSmaliFiles(),
+                I18n.t("report.classes"), analysis.getClasses(),
+                I18n.t("report.resources"), analysis.getResources(),
+                I18n.t("report.permissions"), analysis.getPermissions(),
+                I18n.t("report.components"), analysis.getComponents(),
+                I18n.t("report.engineStatus"),
+                I18n.t("report.environment"), I18n.t("report.ready"),
+                I18n.t("report.engine"),
+                I18n.t("report.interface"), I18n.t("report.interfaceValue"),
+                I18n.t("report.editor"), I18n.t("report.editorValue"));
         String path = "apkeditor://analysis-report/"
                 + Integer.toHexString((analysis.getPackageName() + analysis.getVersionName()
                 + analysis.getFileCount() + analysis.getClasses()).hashCode());
@@ -408,7 +429,7 @@ public final class DecompileView extends JPanel {
 
     private void runDecompile() {
         if (state.isBusy()) {
-            logService.warning("Ya hay una operación en curso.");
+            logService.warning(I18n.t("decompile.busy"));
             return;
         }
         File input = state.getCurrentInput();
@@ -425,9 +446,8 @@ public final class DecompileView extends JPanel {
         File output = uniqueOutput(input);
 
         bottom.getProgressPanel().resetForRun();
-        bottom.getProgressPanel().setDescription(
-                "Extrayendo recursos, generando código smali y analizando la aplicación...");
-        logService.info("Descompilación iniciada: " + input.getName());
+        bottom.getProgressPanel().setDescription(I18n.t("decompile.progress"));
+        logService.info(I18n.t("decompile.started", input.getName()));
 
         int[] simulated = {4};
         if (activityTimer != null) {
@@ -454,11 +474,11 @@ public final class DecompileView extends JPanel {
                     if (success) {
                         state.setCurrentOutput(output);
                         bottom.getProgressPanel().setDescription(
-                                "Proyecto generado en " + output.getAbsolutePath());
-                        logService.success("Proyecto listo: " + output.getAbsolutePath());
+                                I18n.t("decompile.outputReady", output.getAbsolutePath()));
+                        logService.success(I18n.t("decompile.success",
+                                output.getAbsolutePath()));
                     } else {
-                        bottom.getProgressPanel().setDescription(
-                                "La descompilación no se completó. Revisa el panel de log.");
+                        bottom.getProgressPanel().setDescription(I18n.t("decompile.failed"));
                     }
                 });
         if (!started) {
@@ -499,9 +519,9 @@ public final class DecompileView extends JPanel {
 
     private File chooseApk() {
         JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Seleccionar APK");
+        chooser.setDialogTitle(I18n.t("apk.dialogTitle"));
         chooser.setFileFilter(new FileNameExtensionFilter(
-                "APK / ZIP / AAB", "apk", "zip", "aab"));
+                I18n.t("apk.filter"), "apk", "zip", "aab"));
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             return chooser.getSelectedFile();
         }
@@ -546,20 +566,20 @@ public final class DecompileView extends JPanel {
 
     private void resetWorkspace() {
         if (state.isBusy()) {
-            logService.warning("Espera a que termine la operación en curso.");
+            logService.warning(I18n.t("decompile.wait"));
             return;
         }
         state.setCurrentInput(null);
         state.setCurrentOutput(null);
         state.setAnalysis(ApkAnalysis.demo());
         state.setCurrentTree(SampleProject.buildTree());
-        logService.info("Espacio de trabajo restablecido.");
+        logService.info(I18n.t("decompile.resetDone"));
     }
 
     private void updateSubtitle() {
         File input = state.getCurrentInput();
         if (input == null) {
-            subtitle.setText("app-debug.apk  ·  espacio de demostración");
+            subtitle.setText(I18n.t("decompile.demoSubtitle"));
             subtitle.setToolTipText(null);
         } else {
             subtitle.setText(input.getName() + "  ·  " + input.getAbsolutePath());
@@ -579,10 +599,12 @@ public final class DecompileView extends JPanel {
     }
 
     private final class WorkspaceTab extends JButton {
+        private final String tabId;
         private boolean active;
 
-        private WorkspaceTab(String text) {
+        private WorkspaceTab(String tabId, String text) {
             super(text);
+            this.tabId = tabId;
             setFont(Fonts.BODY_MEDIUM);
             setForeground(Colors.TEXT_SECONDARY);
             setFocusPainted(false);
@@ -592,6 +614,10 @@ public final class DecompileView extends JPanel {
             setRolloverEnabled(true);
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+        }
+
+        private String getTabId() {
+            return tabId;
         }
 
         private void setActive(boolean active) {

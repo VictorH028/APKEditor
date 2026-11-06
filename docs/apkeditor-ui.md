@@ -139,10 +139,10 @@ La ventana principal es `MainWindow`:
 
 ```text
 +------------------------------------------------------------------+
-| Topbar: marca | selector de APK | tema | minimizar/maximizar/cerrar |
+| Topbar: marca | selector de APK | tema | idioma | minimizar/maximizar/cerrar |
 +------------+-----------------------------------------------------+
 | Sidebar    | Área de contenido                                   |
-| 236 px     | Dashboard / Workspace / Operaciones / Información   |
+| 236 px     | Panel / Workspace / Operaciones / Información       |
 |            | Configuración                                       |
 +------------+-----------------------------------------------------+
 | Barra de estado: sistema, memoria y estado de la operación        |
@@ -160,16 +160,16 @@ La ventana principal es `MainWindow`:
 
 | Elemento del sidebar | Ruta | Destino |
 | --- | --- | --- |
-| Dashboard | `DASHBOARD` | Panel de control, estado y accesos rápidos |
+| Panel | `DASHBOARD` | Panel de control, estado y accesos rápidos |
 | Descompilar | `DECOMPILE` | Workspace en la pestaña Estructura |
 | Analizar | `ANALYZE` | Workspace en la pestaña Análisis |
-| Smali Viewer | `SMALI_VIEWER` | Workspace en la pestaña Código |
-| Build | `BUILD` | Vista de operación Build |
-| Merge | `MERGE` | Vista de operación Merge |
-| Refactor | `REFACTOR` | Vista de operación Refactor |
+| Visor Smali | `SMALI_VIEWER` | Workspace en la pestaña Código |
+| Construir | `BUILD` | Vista de operación Build |
+| Fusionar | `MERGE` | Vista de operación Merge |
+| Refactorizar | `REFACTOR` | Vista de operación Refactor |
 | Proteger | `PROTECT` | Vista de operación Protect |
 | Información | `INFORMATION` | Detalle técnico del APK |
-| Configuración | `SETTINGS` | Temas, rutas, motor y atajos |
+| Configuración | `SETTINGS` | Temas, idioma, rutas, motor y atajos |
 
 La ruta `DECODE` existe como alias y se redirige a `DECOMPILE`. La ruta `LOGS` existe en el enum, pero los logs se muestran integrados en el workspace y en las vistas de operación.
 
@@ -325,6 +325,18 @@ Se pueden cambiar desde:
 
 Al cambiar el tema, `MainWindow` reconstruye la interfaz y conserva los archivos abiertos mediante `AppState`. El tema no se guarda entre reinicios.
 
+### 11.1 Idioma
+
+La interfaz admite español e inglés:
+
+- Idioma por defecto: español.
+- Selector en la topbar, junto al tema.
+- Selector en la tarjeta **Apariencia** de Configuración.
+- Al cambiar el idioma, `MainWindow` reconstruye la interfaz y conserva la ruta actual y los archivos abiertos mediante `AppState`.
+- Las traducciones viven en `src/main/resources/i18n/messages.properties` (inglés base) y `messages_es.properties` (español).
+- `I18n` centraliza las traducciones y devuelve la clave si falta un texto.
+- El idioma no se guarda entre reinicios.
+
 Paleta principal de `Futuristic`:
 
 | Uso | Color |
@@ -364,6 +376,7 @@ Los iconos se dibujan con Java2D mediante `IconFactory`; no se usan imágenes es
 | `gui.log` | Panel de logs |
 | `gui.model` | Estado compartido y modelos de la UI |
 | `gui.service` | Análisis APK, logs y ejecución de operaciones |
+| `gui.i18n` | Traducciones español/inglés y cambio de idioma |
 | `gui.theme` | Colores, fuentes, iconos y temas |
 | `gui.navigation` | Rutas y navegación |
 | `core` | Contratos y adaptadores del motor |
@@ -494,6 +507,7 @@ Implementado:
 - Ventana principal, topbar, sidebar, rutas y barra de estado.
 - Dashboard, workspace, información y configuración.
 - Temas en caliente.
+- Cambio de idioma español/inglés en caliente.
 - Carga y análisis de APK.
 - Árbol de archivos y búsqueda.
 - Editor con resaltado, numeración, búsqueda e ir a línea.
@@ -505,7 +519,7 @@ Pendiente o limitado:
 
 - Guardar los cambios del editor en el APK o proyecto.
 - Atajos `Ctrl+S` y `Ctrl+W`.
-- Persistencia del tema y de la sesión entre reinicios.
+- Persistencia del tema, del idioma y de la sesión entre reinicios.
 - Formularios avanzados con todas las opciones específicas del motor.
 - Ruta dedicada de logs en el sidebar.
 - Pruebas automatizadas de la interfaz.

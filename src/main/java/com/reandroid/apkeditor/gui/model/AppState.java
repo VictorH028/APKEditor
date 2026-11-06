@@ -16,6 +16,7 @@ public final class AppState {
     public static final String BUSY_CHANGED = "busy";
     public static final String ANALYSIS_CHANGED = "analysis";
     public static final String THEME_CHANGED = "theme";
+    public static final String LANGUAGE_CHANGED = "language";
     public static final String FILES_CHANGED = "files";
     public static final String TREE_CHANGED = "tree";
 
@@ -26,6 +27,7 @@ public final class AppState {
     private String activeRoute = "dashboard";
     private boolean busy;
     private String themeName = "Futuristic";
+    private String languageCode = "es";
     private ApkAnalysis analysis = ApkAnalysis.demo();
     private FileNode currentTree;
     private final List<SourceFile> openFiles = new ArrayList<>();
@@ -64,6 +66,13 @@ public final class AppState {
         String old = this.themeName;
         this.themeName = themeName;
         changes.firePropertyChange(THEME_CHANGED, old, themeName);
+    }
+
+    public String getLanguageCode() { return languageCode; }
+    public void setLanguageCode(String languageCode) {
+        String old = this.languageCode;
+        this.languageCode = languageCode == null ? "es" : languageCode;
+        changes.firePropertyChange(LANGUAGE_CHANGED, old, this.languageCode);
     }
 
     public ApkAnalysis getAnalysis() { return analysis; }

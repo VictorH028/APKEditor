@@ -4,6 +4,7 @@ import com.reandroid.apkeditor.core.LegacyOptionsOperation;
 import com.reandroid.apkeditor.core.Operation;
 import com.reandroid.apkeditor.gui.components.NeonButton;
 import com.reandroid.apkeditor.gui.components.PanelCard;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.log.LogPanel;
 import com.reandroid.apkeditor.gui.model.AppState;
 import com.reandroid.apkeditor.gui.panel.AnalysisProgressPanel;
@@ -33,9 +34,12 @@ public final class OperationView extends JPanel {
 
     private final JTextField inputField = new JTextField();
     private final JTextField outputField = new JTextField();
-    private final NeonButton runButton = new NeonButton("Ejecutar");
+    private final NeonButton runButton = new NeonButton(I18n.t("op.run"));
     private final AnalysisProgressPanel progressPanel =
-            new AnalysisProgressPanel(new String[]{"Preparando", "Ejecutando", "Finalizando"});
+            new AnalysisProgressPanel(new String[]{
+                    I18n.t("op.stepPreparing"),
+                    I18n.t("op.stepRunning"),
+                    I18n.t("op.stepFinishing")});
     private final LogPanel logPanel;
 
     private boolean inputDirectory;
@@ -110,8 +114,8 @@ public final class OperationView extends JPanel {
     }
 
     private JComponent createForm() {
-        PanelCard form = new PanelCard("Configuración de la operación", "settings");
-        form.setSubtitle("APKEditor core · " + operationId);
+        PanelCard form = new PanelCard(I18n.t("op.formTitle"), "settings");
+        form.setSubtitle(I18n.t("op.formSubtitle", operationId));
 
         JPanel body = form.getBody();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
@@ -119,15 +123,14 @@ public final class OperationView extends JPanel {
         inputDirectory = "build".equals(operationId);
         outputDirectory = false;
 
-        body.add(fieldBlock(inputDirectory ? "Directorio de entrada" : "APK de entrada",
+        body.add(fieldBlock(inputDirectory
+                        ? I18n.t("op.inputDirectory") : I18n.t("op.inputApk"),
                 inputField, inputDirectory));
         body.add(Box.createVerticalStrut(12));
-        body.add(fieldBlock("Salida", outputField, outputDirectory));
+        body.add(fieldBlock(I18n.t("op.output"), outputField, outputDirectory));
         body.add(Box.createVerticalStrut(16));
 
-        JLabel hint = new JLabel("<html>La salida se genera automáticamente si dejas "
-                + "el campo vacío.<br>Se utilizan las opciones existentes del motor "
-                + "sin duplicar lógica.</html>");
+        JLabel hint = new JLabel("<html>" + I18n.t("op.hint") + "</html>");
         hint.setFont(Fonts.SMALL);
         hint.setForeground(Colors.TEXT_MUTED);
         hint.setAlignmentX(LEFT_ALIGNMENT);
@@ -141,7 +144,7 @@ public final class OperationView extends JPanel {
         runButton.setVariant(NeonButton.Variant.PRIMARY);
         runButton.setIcon(IconFactory.icon("play", 13, Colors.BACKGROUND));
         runButton.addActionListener(e -> run());
-        NeonButton reset = new NeonButton("Restablecer");
+        NeonButton reset = new NeonButton(I18n.t("op.reset"));
         reset.setVariant(NeonButton.Variant.GHOST);
         reset.addActionListener(e -> prefill());
 
@@ -169,9 +172,10 @@ public final class OperationView extends JPanel {
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Colors.BORDER),
                 BorderFactory.createEmptyBorder(7, 9, 7, 9)));
-        field.setToolTipText(directory ? "Ruta del directorio" : "Ruta del archivo");
+        field.setToolTipText(directory
+                ? I18n.t("op.tooltipDirectory") : I18n.t("op.tooltipFile"));
 
-        NeonButton browse = new NeonButton("Examinar");
+        NeonButton browse = new NeonButton(I18n.t("op.browse"));
         browse.setVariant(NeonButton.Variant.GHOST);
         browse.setIcon(IconFactory.icon("folder-open", 14, Colors.TEXT_SECONDARY));
         browse.addActionListener(e -> browse(field, directory));
@@ -192,7 +196,7 @@ public final class OperationView extends JPanel {
                 ? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
         if (!directory) {
             chooser.setFileFilter(new FileNameExtensionFilter(
-                    "APK / ZIP / AAB", "apk", "zip", "aab"));
+                    I18n.t("apk.filter"), "apk", "zip", "aab"));
         }
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             field.setText(chooser.getSelectedFile().getAbsolutePath());
@@ -214,12 +218,12 @@ public final class OperationView extends JPanel {
 
     private void run() {
         if (running) {
-            logs.warning("La operación ya está en ejecución.");
+            logs.warning(I18n.t("op.alreadyRunning"));
             return;
         }
         File input = readFile(inputField);
         if (input == null) {
-            logs.warning("Selecciona la entrada antes de ejecutar.");
+            logs.warning(I18n.t("op.selectInput"));
             inputField.requestFocusInWindow();
             return;
         }
@@ -233,8 +237,8 @@ public final class OperationView extends JPanel {
         running = true;
         runButton.setEnabled(false);
         progressPanel.resetForRun();
-        progressPanel.setDescription("Ejecutando " + operation.getName() + "...");
-        logs.info("Operación solicitada: " + operation.getName());
+        progressPanel.setDescription(I18n.t("op.executing", operation.getName()));
+        logs.info(I18n.t("op.requested", operation.getName()));
 
         activity[0] = 5;
         if (activityTimer != null) {
@@ -269,9 +273,8 @@ public final class OperationView extends JPanel {
                             && legacy.getOptions().outputFile != null) {
                         state.setCurrentOutput(legacy.getOptions().outputFile);
                     }
-                    progressPanel.setDescription(success
-                            ? "Operación finalizada correctamente."
-                            : "La operación terminó con errores. Revisa el log.");
+                    progressPanel.setDescription(I18n.t(success
+                            ? "op.completed" : "op.failed"));
                 });
         if (!started) {
             running = false;
@@ -314,23 +317,23 @@ public final class OperationView extends JPanel {
 
     private String titleFor(String id) {
         return switch (id.toLowerCase(Locale.ROOT)) {
-            case "build" -> "Construir APK";
-            case "merge" -> "Fusionar APKs";
-            case "refactor" -> "Refactorizar recursos";
-            case "protect" -> "Proteger APK";
-            case "info" -> "Información del APK";
+            case "build" -> I18n.t("op.title.build");
+            case "merge" -> I18n.t("op.title.merge");
+            case "refactor" -> I18n.t("op.title.refactor");
+            case "protect" -> I18n.t("op.title.protect");
+            case "info" -> I18n.t("op.title.info");
             default -> operation.getName();
         };
     }
 
     private String descriptionFor(String id) {
         return switch (id.toLowerCase(Locale.ROOT)) {
-            case "build" -> "Compila un proyecto descompilado de vuelta a un APK firmado.";
-            case "merge" -> "Combina módulos y recursos en un único paquete.";
-            case "refactor" -> "Renombra y normaliza recursos, clases y rutas.";
-            case "protect" -> "Ofusca nombres y protege el APK resultante.";
-            case "info" -> "Extrae información técnica del manifiesto y recursos.";
-            default -> "Operación del motor APKEditor.";
+            case "build" -> I18n.t("op.desc.build");
+            case "merge" -> I18n.t("op.desc.merge");
+            case "refactor" -> I18n.t("op.desc.refactor");
+            case "protect" -> I18n.t("op.desc.protect");
+            case "info" -> I18n.t("op.desc.info");
+            default -> I18n.t("op.desc.default");
         };
     }
 

@@ -5,6 +5,7 @@ import com.reandroid.apkeditor.core.Operation;
 import com.reandroid.apkeditor.core.OperationListener;
 import com.reandroid.apkeditor.core.OperationRegistry;
 import com.reandroid.apkeditor.core.OperationResult;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.LogLevel;
 import com.reandroid.apkeditor.gui.model.LogEntry;
 
@@ -38,11 +39,11 @@ public final class OperationService {
                            Completion completion) {
         Operation operation = registry.get(id);
         if (operation == null) {
-            logService.error("Operación no registrada: " + id);
+            logService.error(I18n.t("op.error.notRegistered", id));
             return false;
         }
         if (!(operation instanceof LegacyOptionsOperation legacy)) {
-            logService.error("Adaptador de operación no soportado: " + id);
+            logService.error(I18n.t("op.error.unsupportedAdapter", id));
             return false;
         }
         if (input != null) {
@@ -87,7 +88,8 @@ public final class OperationService {
                         if ((text == null || text.isBlank()) && error != null) {
                             text = error.getMessage();
                         }
-                        logService.add(LogLevel.ERROR, text == null ? "Error desconocido" : text);
+                        logService.add(LogLevel.ERROR, text == null
+                                ? I18n.t("op.error.unknown") : text);
                     }
 
                     @Override
@@ -95,10 +97,10 @@ public final class OperationService {
                         completed.set(true);
                         SwingUtilities.invokeLater(() -> {
                             if (result.isSuccess()) {
-                                logService.success("Operación completada: " + operation.getName()
-                                        + " (" + result.getDurationMillis() + " ms)");
+                                logService.success(I18n.t("op.completedWithTime",
+                                        operation.getName(), result.getDurationMillis()));
                             } else {
-                                logService.error("Operación fallida: " + operation.getName());
+                                logService.error(I18n.t("op.failedLog", operation.getName()));
                             }
                             if (progress != null) {
                                 progress.accept(result.isSuccess() ? 100 : 0);
@@ -117,7 +119,7 @@ public final class OperationService {
                     return;
                 }
                 SwingUtilities.invokeLater(() -> {
-                    logService.error("Operación abortada: " + shortMessage(error));
+                    logService.error(I18n.t("op.aborted", shortMessage(error)));
                     if (progress != null) {
                         progress.accept(0);
                     }

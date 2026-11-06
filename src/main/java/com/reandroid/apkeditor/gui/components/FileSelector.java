@@ -1,5 +1,6 @@
 package com.reandroid.apkeditor.gui.components;
 
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.theme.Colors;
 import com.reandroid.apkeditor.gui.theme.Fonts;
 
@@ -18,7 +19,7 @@ public final class FileSelector extends JPanel {
         title.setFont(Fonts.SMALL);
         title.setForeground(Colors.TEXT_MUTED);
 
-        NeonButton browse = new NeonButton("BROWSE");
+        NeonButton browse = new NeonButton(I18n.t("fileSelector.browse"));
         browse.addActionListener(e -> choose(directory));
 
         field.setFont(Fonts.BODY);

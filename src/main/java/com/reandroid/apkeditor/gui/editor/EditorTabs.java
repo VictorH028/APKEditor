@@ -2,6 +2,7 @@ package com.reandroid.apkeditor.gui.editor;
 
 import com.reandroid.apkeditor.gui.components.NeonButton;
 import com.reandroid.apkeditor.gui.components.SearchField;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.AppState;
 import com.reandroid.apkeditor.gui.model.SourceFile;
 import com.reandroid.apkeditor.gui.theme.Colors;
@@ -32,11 +33,12 @@ public final class EditorTabs extends JPanel {
     private final JPanel tabBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
     private final Map<String, CodeEditor> editors = new LinkedHashMap<>();
     private final Map<String, TabComponent> tabs = new LinkedHashMap<>();
-    private final JLabel caretLabel = new JLabel("Ln 1, Col 1");
+    private final JLabel caretLabel = new JLabel(I18n.t("editor.caret", 1, 1));
     private final JLabel languageLabel = new JLabel("Smali");
-    private final JLabel spacesLabel = new JLabel("Spaces: 4");
+    private final JLabel spacesLabel = new JLabel(I18n.t("editor.spaces"));
     private final JLabel encodingLabel = new JLabel("UTF-8");
-    private final SearchField searchField = new SearchField("Buscar en el archivo...");
+    private final SearchField searchField = new SearchField(
+            I18n.t("editor.searchPlaceholder"));
     private final JPanel searchBar = new JPanel(new BorderLayout());
     private final JPanel emptyState = new JPanel(new GridBagLayout());
     private String activeKey;
@@ -77,7 +79,7 @@ public final class EditorTabs extends JPanel {
 
         content.setOpaque(false);
         emptyState.setOpaque(false);
-        JLabel empty = new JLabel("Abre un archivo desde el explorador", SwingConstants.CENTER);
+        JLabel empty = new JLabel(I18n.t("editor.empty"), SwingConstants.CENTER);
         empty.setForeground(Colors.TEXT_MUTED);
         empty.setFont(Fonts.BODY);
         emptyState.add(empty);
@@ -111,16 +113,16 @@ public final class EditorTabs extends JPanel {
     private JComponent createToolbar() {
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         toolbar.setOpaque(false);
-        NeonButton search = iconButton("search", "Buscar en el archivo (Ctrl+F)");
+        NeonButton search = iconButton("search", I18n.t("editor.searchTooltip"));
         search.addActionListener(e -> toggleSearch(true));
-        NeonButton copy = iconButton("copy", "Copiar selección");
+        NeonButton copy = iconButton("copy", I18n.t("editor.copyTooltip"));
         copy.addActionListener(e -> {
             CodeEditor editor = getActiveEditor();
             if (editor != null) {
                 editor.copy();
             }
         });
-        NeonButton more = iconButton("settings", "Opciones del editor");
+        NeonButton more = iconButton("settings", I18n.t("editor.optionsTooltip"));
         more.addActionListener(e -> showEditorMenu(more));
         toolbar.add(search);
         toolbar.add(copy);
@@ -310,7 +312,7 @@ public final class EditorTabs extends JPanel {
     }
 
     private void updateCaret(int[] values) {
-        caretLabel.setText("Ln " + values[0] + ", Col " + values[1]);
+        caretLabel.setText(I18n.t("editor.caret", values[0], values[1]));
     }
 
     private void toggleSearch(boolean show) {
@@ -347,8 +349,8 @@ public final class EditorTabs extends JPanel {
         if (editor == null) {
             return;
         }
-        String value = JOptionPane.showInputDialog(this, "Número de línea:",
-                "Ir a línea", JOptionPane.PLAIN_MESSAGE);
+        String value = JOptionPane.showInputDialog(this, I18n.t("editor.lineNumber"),
+                I18n.t("editor.gotoLine"), JOptionPane.PLAIN_MESSAGE);
         if (value == null || value.isBlank()) {
             return;
         }
@@ -362,15 +364,15 @@ public final class EditorTabs extends JPanel {
         JPopupMenu menu = new JPopupMenu();
         menu.setBackground(Colors.PANEL_SECONDARY);
         menu.setBorder(BorderFactory.createLineBorder(Colors.BORDER));
-        menu.add(menuItem("Ir a línea...", e -> gotoLineDialog()));
-        menu.add(menuItem("Seleccionar todo", e -> {
+        menu.add(menuItem(I18n.t("editor.menu.goto"), e -> gotoLineDialog()));
+        menu.add(menuItem(I18n.t("editor.menu.selectAll"), e -> {
             CodeEditor editor = getActiveEditor();
             if (editor != null) {
                 editor.getTextPane().selectAll();
             }
         }));
         menu.addSeparator();
-        menu.add(menuItem("Cerrar pestaña", e -> closeActive()));
+        menu.add(menuItem(I18n.t("editor.menu.closeTab"), e -> closeActive()));
         menu.show(anchor, 0, anchor.getHeight());
     }
 
@@ -396,7 +398,7 @@ public final class EditorTabs extends JPanel {
             case "json" -> "JSON";
             case "hex" -> "Hex";
             case "java" -> "Java";
-            default -> "Text";
+            default -> I18n.t("editor.language.text");
         };
     }
 
@@ -421,7 +423,7 @@ public final class EditorTabs extends JPanel {
             JLabel close = new JLabel(IconFactory.icon("close", 11, Colors.TEXT_MUTED));
             close.setBorder(new EmptyBorder(0, 4, 0, 0));
             close.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            close.setToolTipText("Cerrar " + file.getName());
+            close.setToolTipText(I18n.t("editor.closeTab", file.getName()));
             close.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {

@@ -3,6 +3,7 @@ package com.reandroid.apkeditor.gui.panel;
 import com.reandroid.apkeditor.gui.components.NeonProgressBar;
 import com.reandroid.apkeditor.gui.components.PanelCard;
 import com.reandroid.apkeditor.gui.components.StatusDot;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.theme.Colors;
 import com.reandroid.apkeditor.gui.theme.Fonts;
 import com.reandroid.apkeditor.gui.theme.IconFactory;
@@ -21,16 +22,16 @@ public final class AnalysisProgressPanel extends PanelCard {
 
     private final JLabel description = new JLabel();
     private final NeonProgressBar progress = new NeonProgressBar();
-    private final JLabel stateLabel = new JLabel("EN PROCESO");
+    private final JLabel stateLabel = new JLabel(I18n.t("progress.state.running"));
     private final StatusDot stateDot = new StatusDot(Colors.WARNING);
     private final List<StepChip> steps = new ArrayList<>();
     private final JPanel stepsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 14, 0));
 
     public AnalysisProgressPanel(String[] stepNames) {
-        super("Descompilando y Analizando APK", "workflow");
-        setSubtitle("Pipeline del motor");
+        super(I18n.t("progress.title"), "workflow");
+        setSubtitle(I18n.t("progress.subtitle"));
 
-        description.setText("Extrayendo recursos, generando código smali y analizando la aplicación...");
+        description.setText(I18n.t("progress.description"));
         description.setFont(Fonts.SMALL);
         description.setForeground(Colors.TEXT_SECONDARY);
 
@@ -94,7 +95,7 @@ public final class AnalysisProgressPanel extends PanelCard {
 
     public void resetForRun() {
         setProgress(0);
-        setState("EN PROCESO", Colors.WARNING);
+        setState(I18n.t("progress.state.running"), Colors.WARNING);
         for (int i = 0; i < steps.size(); i++) {
             steps.get(i).setStatus(i == 0 ? StepStatus.ACTIVE : StepStatus.PENDING);
         }
@@ -102,7 +103,7 @@ public final class AnalysisProgressPanel extends PanelCard {
 
     public void finish(boolean success) {
         setProgress(success ? 100 : 0);
-        setState(success ? "COMPLETADO" : "FALLIDO",
+        setState(I18n.t(success ? "progress.state.completed" : "progress.state.failed"),
                 success ? Colors.SUCCESS : Colors.ERROR);
         for (StepChip step : steps) {
             step.setStatus(success ? StepStatus.COMPLETED : StepStatus.PENDING);

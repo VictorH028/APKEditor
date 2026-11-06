@@ -1,6 +1,7 @@
 package com.reandroid.apkeditor.gui.panel;
 
 import com.reandroid.apkeditor.gui.components.PanelCard;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.ApkAnalysis;
 import com.reandroid.apkeditor.gui.theme.Colors;
 import com.reandroid.apkeditor.gui.theme.Fonts;
@@ -18,16 +19,16 @@ public final class ApplicationInfoPanel extends PanelCard {
     private final Map<String, JLabel> values = new LinkedHashMap<>();
 
     public ApplicationInfoPanel() {
-        super("Información de la aplicación", "android");
-        setSubtitle("Manifest");
+        super(I18n.t("applicationInfo.title"), "android");
+        setSubtitle(I18n.t("applicationInfo.subtitle"));
 
         JPanel body = getBody();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        addRow(body, "Nombre");
-        addRow(body, "Versión");
-        addRow(body, "Package");
-        addRow(body, "Min SDK");
-        addRow(body, "Target SDK");
+        addRow(body, I18n.t("applicationInfo.name"));
+        addRow(body, I18n.t("applicationInfo.version"));
+        addRow(body, I18n.t("applicationInfo.package"));
+        addRow(body, I18n.t("applicationInfo.minSdk"));
+        addRow(body, I18n.t("applicationInfo.targetSdk"));
         setAnalysis(ApkAnalysis.demo());
     }
 
@@ -55,11 +56,11 @@ public final class ApplicationInfoPanel extends PanelCard {
         if (analysis == null) {
             return;
         }
-        setValue("Nombre", analysis.getAppName());
-        setValue("Versión", analysis.getVersionName());
-        setValue("Package", analysis.getPackageName());
-        setValue("Min SDK", String.valueOf(analysis.getMinSdk()));
-        setValue("Target SDK", String.valueOf(analysis.getTargetSdk()));
+        setValue(I18n.t("applicationInfo.name"), analysis.getAppName());
+        setValue(I18n.t("applicationInfo.version"), analysis.getVersionName());
+        setValue(I18n.t("applicationInfo.package"), analysis.getPackageName());
+        setValue(I18n.t("applicationInfo.minSdk"), String.valueOf(analysis.getMinSdk()));
+        setValue(I18n.t("applicationInfo.targetSdk"), String.valueOf(analysis.getTargetSdk()));
     }
 
     private void setValue(String key, String value) {

@@ -120,8 +120,9 @@ Abre la aplicación Termux:X11 y ejecuta el comando Java de la GUI.
 3. Elige un archivo APK/ZIP.
 4. Explora el árbol, abre archivos en el editor y revisa los logs.
 5. Usa `F5` o el botón **Descompilar** para generar el proyecto.
-6. Usa las vistas **Build**, **Merge**, **Refactor** y **Proteger** para ejecutar las operaciones del motor.
+6. Usa las vistas **Construir**, **Fusionar**, **Refactorizar** y **Proteger** para ejecutar las operaciones del motor.
+7. Cambia el idioma español/inglés desde la topbar o desde **Configuración**.
 
 ## Estado
 
-La interfaz actual está implementada con Swing + Java2D. El detalle de módulos, atajos, temas, operaciones y limitaciones está en [docs/apkeditor-ui.md](docs/apkeditor-ui.md).
+La interfaz actual está implementada con Swing + Java2D. Incluye temas en caliente y cambio de idioma español/inglés. El detalle de módulos, atajos, temas, idioma, operaciones y limitaciones está en [docs/apkeditor-ui.md](docs/apkeditor-ui.md).

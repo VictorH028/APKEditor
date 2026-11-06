@@ -2,6 +2,7 @@ package com.reandroid.apkeditor.gui.view;
 
 import com.reandroid.apkeditor.gui.components.NeonButton;
 import com.reandroid.apkeditor.gui.components.PanelCard;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.ApkAnalysis;
 import com.reandroid.apkeditor.gui.model.AppState;
 import com.reandroid.apkeditor.gui.navigation.Route;
@@ -36,10 +37,10 @@ public final class InformationView extends JPanel {
         setBackground(Colors.BACKGROUND);
         setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
 
-        JLabel title = new JLabel("Información");
+        JLabel title = new JLabel(I18n.t("info.title"));
         title.setFont(Fonts.TITLE);
         title.setForeground(Colors.TEXT);
-        JLabel subtitle = new JLabel("Detalle técnico del paquete y sus componentes");
+        JLabel subtitle = new JLabel(I18n.t("info.subtitle"));
         subtitle.setFont(Fonts.SMALL);
         subtitle.setForeground(Colors.TEXT_MUTED);
 
@@ -48,7 +49,7 @@ public final class InformationView extends JPanel {
         titles.add(title, BorderLayout.NORTH);
         titles.add(subtitle, BorderLayout.SOUTH);
 
-        NeonButton open = new NeonButton("Ver workspace",
+        NeonButton open = new NeonButton(I18n.t("info.openWorkspace"),
                 IconFactory.icon("code", 14, Colors.BACKGROUND));
         open.setVariant(NeonButton.Variant.PRIMARY);
         open.addActionListener(e -> navigate.accept(Route.DECOMPILE));
@@ -91,13 +92,19 @@ public final class InformationView extends JPanel {
     }
 
     private JComponent createTechnical() {
-        PanelCard card = new PanelCard("Detalle técnico", "binary");
-        card.setSubtitle("Estructura del paquete");
+        PanelCard card = new PanelCard(I18n.t("info.detailTitle"), "binary");
+        card.setSubtitle(I18n.t("info.detailSubtitle"));
 
         JPanel body = card.getBody();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        for (String key : new String[]{"Archivo", "Ruta", "Tamaño APK", "Archivos",
-                "Version code", "Clases", "Permisos"}) {
+        for (String key : new String[]{
+                I18n.t("info.field.file"),
+                I18n.t("info.field.path"),
+                I18n.t("info.field.size"),
+                I18n.t("info.field.files"),
+                I18n.t("info.field.versionCode"),
+                I18n.t("info.field.classes"),
+                I18n.t("info.field.permissions")}) {
             addRow(body, key);
         }
         body.add(Box.createVerticalGlue());
@@ -127,19 +134,20 @@ public final class InformationView extends JPanel {
 
     private void applyInput() {
         File input = state.getCurrentInput();
-        set("Archivo", input == null ? "app-debug.apk (demo)" : input.getName());
-        set("Ruta", input == null ? "—" : input.getAbsolutePath());
+        set(I18n.t("info.field.file"), input == null
+                ? I18n.t("info.demoFile") : input.getName());
+        set(I18n.t("info.field.path"), input == null ? "—" : input.getAbsolutePath());
         applyAnalysis(state.getAnalysis());
     }
 
     private void applyAnalysis(ApkAnalysis analysis) {
         information.setAnalysis(analysis);
         statistics.setAnalysis(analysis);
-        set("Tamaño APK", analysis.getSizeLabel());
-        set("Archivos", String.valueOf(analysis.getFileCount()));
-        set("Version code", String.valueOf(analysis.getVersionCode()));
-        set("Clases", String.valueOf(analysis.getClasses()));
-        set("Permisos", String.valueOf(analysis.getPermissions()));
+        set(I18n.t("info.field.size"), analysis.getSizeLabel());
+        set(I18n.t("info.field.files"), String.valueOf(analysis.getFileCount()));
+        set(I18n.t("info.field.versionCode"), String.valueOf(analysis.getVersionCode()));
+        set(I18n.t("info.field.classes"), String.valueOf(analysis.getClasses()));
+        set(I18n.t("info.field.permissions"), String.valueOf(analysis.getPermissions()));
     }
 
     private void set(String key, String value) {

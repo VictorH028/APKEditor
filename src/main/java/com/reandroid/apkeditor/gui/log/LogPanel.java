@@ -2,6 +2,7 @@ package com.reandroid.apkeditor.gui.log;
 
 import com.reandroid.apkeditor.gui.components.NeonButton;
 import com.reandroid.apkeditor.gui.components.PanelCard;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.LogEntry;
 import com.reandroid.apkeditor.gui.model.LogLevel;
 import com.reandroid.apkeditor.gui.service.LogService;
@@ -29,9 +30,9 @@ public final class LogPanel extends PanelCard implements LogService.Listener {
     private final JScrollPane scroll;
 
     public LogPanel(LogService logService) {
-        super("Panel de Log", "terminal");
+        super(I18n.t("log.panelTitle"), "terminal");
         this.logService = logService;
-        setSubtitle("Eventos del motor en tiempo real");
+        setSubtitle(I18n.t("log.panelSubtitle"));
 
         textPane.setEditable(false);
         textPane.setFont(Fonts.MONO_SMALL);
@@ -48,14 +49,14 @@ public final class LogPanel extends PanelCard implements LogService.Listener {
         scroll.getViewport().setBackground(Colors.SURFACE);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
 
-        NeonButton clear = new NeonButton("Limpiar",
+        NeonButton clear = new NeonButton(I18n.t("log.clear"),
                 IconFactory.icon("trash", 13, Colors.TEXT_SECONDARY));
         clear.setVariant(NeonButton.Variant.GHOST);
         clear.setFont(Fonts.SMALL);
         clear.setCompact(true);
         clear.addActionListener(e -> logService.clear());
 
-        NeonButton export = new NeonButton("Exportar",
+        NeonButton export = new NeonButton(I18n.t("log.export"),
                 IconFactory.icon("download", 13, Colors.TEXT_SECONDARY));
         export.setVariant(NeonButton.Variant.GHOST);
         export.setFont(Fonts.SMALL);
@@ -159,9 +160,9 @@ public final class LogPanel extends PanelCard implements LogService.Listener {
         File file = chooser.getSelectedFile();
         try {
             logService.export(file);
-            logService.success("Log exportado: " + file.getAbsolutePath());
+            logService.success(I18n.t("log.exported", file.getAbsolutePath()));
         } catch (IOException error) {
-            logService.error("No se pudo exportar el log: " + error.getMessage());
+            logService.error(I18n.t("log.exportError", error.getMessage()));
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.reandroid.apkeditor.gui.service;
 
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.LogEntry;
 import com.reandroid.apkeditor.gui.model.LogLevel;
 
@@ -94,20 +95,20 @@ public final class LogService {
         if (!entries.isEmpty()) {
             return;
         }
-        info("Estableciendo entorno de trabajo...");
-        info("Cargando APK: MyApplication.apk");
-        info("Verificando estructura del archivo...");
-        info("Descompilación iniciada...");
-        info("Extrayendo recursos...");
-        info("Generando código smali...");
-        info("Analizando manifest...");
-        info("Procesando librerías...");
-        success("Descompilación completada.");
-        info("Iniciando análisis de la aplicación...");
-        info("Analizando permisos...");
-        info("Detectando componentes...");
-        info("Revisando vulnerabilidades...");
-        success("Análisis completado.");
+        info(I18n.t("seed.workEnvironment"));
+        info(I18n.t("seed.loading"));
+        info(I18n.t("seed.verifying"));
+        info(I18n.t("seed.decompileStarted"));
+        info(I18n.t("seed.extracting"));
+        info(I18n.t("seed.generating"));
+        info(I18n.t("seed.manifest"));
+        info(I18n.t("seed.libraries"));
+        success(I18n.t("seed.decompileDone"));
+        info(I18n.t("seed.analysisStarted"));
+        info(I18n.t("seed.permissions"));
+        info(I18n.t("seed.components"));
+        info(I18n.t("seed.vulnerabilities"));
+        success(I18n.t("seed.analysisDone"));
     }
 
     public synchronized void export(File file) throws IOException {

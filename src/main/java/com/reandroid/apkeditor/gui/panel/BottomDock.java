@@ -1,5 +1,6 @@
 package com.reandroid.apkeditor.gui.panel;
 
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.ApkAnalysis;
 import com.reandroid.apkeditor.gui.theme.Colors;
 
@@ -19,7 +20,10 @@ public final class BottomDock extends JPanel {
         setOpaque(false);
 
         progress = new AnalysisProgressPanel(new String[]{
-                "Cargando APK", "Descompilación", "Análisis", "Generando reporte"});
+                I18n.t("progress.step.loading"),
+                I18n.t("progress.step.decompiling"),
+                I18n.t("progress.step.analysis"),
+                I18n.t("progress.step.report")});
         information = new ApplicationInfoPanel();
         statistics = new StatisticsPanel();
 

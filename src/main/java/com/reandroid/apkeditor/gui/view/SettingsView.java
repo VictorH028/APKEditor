@@ -3,6 +3,7 @@ package com.reandroid.apkeditor.gui.view;
 import com.reandroid.apkeditor.core.OperationRegistry;
 import com.reandroid.apkeditor.gui.components.NeonButton;
 import com.reandroid.apkeditor.gui.components.PanelCard;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.AppState;
 import com.reandroid.apkeditor.gui.theme.Colors;
 import com.reandroid.apkeditor.gui.theme.Fonts;
@@ -31,10 +32,10 @@ public final class SettingsView extends JPanel {
         setBackground(Colors.BACKGROUND);
         setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
 
-        JLabel title = new JLabel("Configuración");
+        JLabel title = new JLabel(I18n.t("settings.title"));
         title.setFont(Fonts.TITLE);
         title.setForeground(Colors.TEXT);
-        JLabel subtitle = new JLabel("Apariencia, rutas y detalles del motor");
+        JLabel subtitle = new JLabel(I18n.t("settings.subtitle"));
         subtitle.setFont(Fonts.SMALL);
         subtitle.setForeground(Colors.TEXT_MUTED);
 
@@ -84,8 +85,8 @@ public final class SettingsView extends JPanel {
     }
 
     private JComponent createAppearance() {
-        PanelCard card = new PanelCard("Apariencia", "settings");
-        card.setSubtitle("Tema " + Theme.current());
+        PanelCard card = new PanelCard(I18n.t("settings.appearance"), "settings");
+        card.setSubtitle(I18n.t("settings.themeSubtitle", Theme.current()));
 
         JPanel themes = new JPanel(new GridLayout(2, 2, 8, 8));
         themes.setOpaque(false);
@@ -97,27 +98,62 @@ public final class SettingsView extends JPanel {
             themes.add(button);
         }
 
-        JLabel hint = new JLabel("<html>El tema se aplica en toda la interfaz y "
-                + "conserva las pestañas abiertas.</html>");
-        hint.setFont(Fonts.SMALL);
-        hint.setForeground(Colors.TEXT_MUTED);
+        JLabel languageLabel = new JLabel(I18n.t("settings.language"));
+        languageLabel.setFont(Fonts.SMALL);
+        languageLabel.setForeground(Colors.TEXT_SECONDARY);
+
+        JPanel languages = new JPanel(new GridLayout(1, 2, 8, 8));
+        languages.setOpaque(false);
+        for (I18n.Language language : I18n.Language.values()) {
+            NeonButton button = new NeonButton(language.getLabel());
+            button.setFont(Fonts.SMALL);
+            button.setVariant(language.getCode().equals(state.getLanguageCode())
+                    ? NeonButton.Variant.PRIMARY : NeonButton.Variant.SECONDARY);
+            button.addActionListener(e -> state.setLanguageCode(language.getCode()));
+            languages.add(button);
+        }
+
+        JLabel themeHint = new JLabel("<html>" + I18n.t("settings.themeHint") + "</html>");
+        themeHint.setFont(Fonts.SMALL);
+        themeHint.setForeground(Colors.TEXT_MUTED);
+
+        JLabel languageHint = new JLabel(I18n.t("settings.languageHint"));
+        languageHint.setFont(Fonts.SMALL);
+        languageHint.setForeground(Colors.TEXT_MUTED);
+
+        JPanel languageBlock = new JPanel(new BorderLayout(0, 6));
+        languageBlock.setOpaque(false);
+        languageBlock.add(languageLabel, BorderLayout.NORTH);
+        languageBlock.add(languages, BorderLayout.CENTER);
+
+        JPanel texts = new JPanel();
+        texts.setOpaque(false);
+        texts.setLayout(new BoxLayout(texts, BoxLayout.Y_AXIS));
+        themeHint.setAlignmentX(LEFT_ALIGNMENT);
+        languageBlock.setAlignmentX(LEFT_ALIGNMENT);
+        languageHint.setAlignmentX(LEFT_ALIGNMENT);
+        texts.add(themeHint);
+        texts.add(Box.createVerticalStrut(12));
+        texts.add(languageBlock);
+        texts.add(Box.createVerticalStrut(4));
+        texts.add(languageHint);
 
         JPanel body = card.getBody();
         body.setLayout(new BorderLayout(0, 12));
         body.add(themes, BorderLayout.NORTH);
-        body.add(hint, BorderLayout.CENTER);
+        body.add(texts, BorderLayout.CENTER);
         return card;
     }
 
     private JComponent createPaths() {
-        PanelCard card = new PanelCard("Rutas de trabajo", "folder-open");
-        card.setSubtitle("Sesión actual");
+        PanelCard card = new PanelCard(I18n.t("settings.paths"), "folder-open");
+        card.setSubtitle(I18n.t("settings.currentSession"));
 
         JPanel body = card.getBody();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        addPathRow(body, "Entrada");
-        addPathRow(body, "Salida");
-        addPathRow(body, "Workspace");
+        addPathRow(body, I18n.t("settings.input"));
+        addPathRow(body, I18n.t("settings.output"));
+        addPathRow(body, I18n.t("settings.workspace"));
         body.add(Box.createVerticalGlue());
         return card;
     }
@@ -144,16 +180,18 @@ public final class SettingsView extends JPanel {
     }
 
     private JComponent createEngine(OperationRegistry registry) {
-        PanelCard card = new PanelCard("Motor", "layers");
+        PanelCard card = new PanelCard(I18n.t("settings.engine"), "layers");
         card.setSubtitle("APKEditor core");
 
         JPanel body = card.getBody();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        addStaticRow(body, "Versión", "1.4.9");
-        addStaticRow(body, "Operaciones", String.valueOf(registry.all().size()));
-        addStaticRow(body, "Java", System.getProperty("java.version", "—"));
-        addStaticRow(body, "Interfaz", "Swing · Java2D");
-        addStaticRow(body, "Editor", "Smali highlighter");
+        addStaticRow(body, I18n.t("settings.version"), "1.4.9");
+        addStaticRow(body, I18n.t("settings.operations"),
+                String.valueOf(registry.all().size()));
+        addStaticRow(body, I18n.t("settings.java"),
+                System.getProperty("java.version", "—"));
+        addStaticRow(body, I18n.t("settings.interface"), "Swing · Java2D");
+        addStaticRow(body, I18n.t("settings.editor"), "Smali highlighter");
         body.add(Box.createVerticalGlue());
         return card;
     }
@@ -179,19 +217,19 @@ public final class SettingsView extends JPanel {
     }
 
     private JComponent createShortcuts() {
-        PanelCard card = new PanelCard("Atajos de teclado", "terminal");
-        card.setSubtitle("Productividad");
+        PanelCard card = new PanelCard(I18n.t("settings.shortcuts"), "terminal");
+        card.setSubtitle(I18n.t("settings.productivity"));
 
         JPanel grid = new JPanel(new GridLayout(2, 4, 12, 6));
         grid.setOpaque(false);
-        addShortcut(grid, "F5", "Iniciar descompilación");
-        addShortcut(grid, "Ctrl + O", "Seleccionar APK");
-        addShortcut(grid, "Ctrl + F", "Buscar código o archivo");
-        addShortcut(grid, "Ctrl + G", "Ir a línea");
-        addShortcut(grid, "Ctrl + S", "Guardar pestaña (editor)");
-        addShortcut(grid, "Ctrl + W", "Cerrar pestaña");
-        addShortcut(grid, "Ctrl + 1", "Volver al workspace");
-        addShortcut(grid, "Esc", "Cerrar búsqueda");
+        addShortcut(grid, "F5", I18n.t("settings.shortcut.decompile"));
+        addShortcut(grid, "Ctrl + O", I18n.t("settings.shortcut.selectApk"));
+        addShortcut(grid, "Ctrl + F", I18n.t("settings.shortcut.search"));
+        addShortcut(grid, "Ctrl + G", I18n.t("settings.shortcut.gotoLine"));
+        addShortcut(grid, "Ctrl + S", I18n.t("settings.shortcut.save"));
+        addShortcut(grid, "Ctrl + W", I18n.t("settings.shortcut.closeTab"));
+        addShortcut(grid, "Ctrl + 1", I18n.t("settings.shortcut.workspace"));
+        addShortcut(grid, "Esc", I18n.t("settings.shortcut.escape"));
 
         card.getBody().setLayout(new BorderLayout());
         card.getBody().add(grid, BorderLayout.CENTER);
@@ -214,13 +252,16 @@ public final class SettingsView extends JPanel {
 
     private void applyInput() {
         File input = state.getCurrentInput();
-        setPath("Entrada", input == null ? "app-debug.apk (demo)" : input.getAbsolutePath());
-        setPath("Workspace", input == null ? "Demo" : input.getParent());
+        setPath(I18n.t("settings.input"), input == null
+                ? I18n.t("settings.demoApk") : input.getAbsolutePath());
+        setPath(I18n.t("settings.workspace"), input == null
+                ? I18n.t("settings.demoWorkspace") : input.getParent());
     }
 
     private void applyOutput() {
         File output = state.getCurrentOutput();
-        setPath("Salida", output == null ? "Automática" : output.getAbsolutePath());
+        setPath(I18n.t("settings.output"), output == null
+                ? I18n.t("settings.auto") : output.getAbsolutePath());
     }
 
     private void setPath(String key, String value) {

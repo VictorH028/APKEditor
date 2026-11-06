@@ -1,12 +1,13 @@
 package com.reandroid.apkeditor.gui.components;
 
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.theme.Colors;
 
 import javax.swing.*;
 import java.awt.*;
 
 public final class ProgressPanel extends JPanel {
-    private final JLabel status = new JLabel("READY");
+    private final JLabel status = new JLabel(I18n.t("progress.ready"));
     private final JProgressBar progress = new JProgressBar();
 
     public ProgressPanel() {
@@ -27,6 +28,6 @@ public final class ProgressPanel extends JPanel {
     public void complete(boolean ok) {
         progress.setIndeterminate(false);
         progress.setValue(100);
-        status.setText(ok ? "DONE" : "FAILED");
+        status.setText(I18n.t(ok ? "progress.done" : "progress.failed"));
     }
 }

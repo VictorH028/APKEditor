@@ -2,6 +2,7 @@ package com.reandroid.apkeditor.gui.tree;
 
 import com.reandroid.apkeditor.gui.components.PanelCard;
 import com.reandroid.apkeditor.gui.components.SearchField;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.FileNode;
 import com.reandroid.apkeditor.gui.theme.Colors;
 import com.reandroid.apkeditor.gui.theme.Fonts;
@@ -27,7 +28,7 @@ import java.util.function.Consumer;
  * documentos reales en el editor.
  */
 public final class FileExplorer extends PanelCard {
-    private final SearchField search = new SearchField("Buscar archivo o carpeta...");
+    private final SearchField search = new SearchField(I18n.t("explorer.search"));
     private final JTree tree = new JTree();
     private final Consumer<FileNode> onOpen;
     private final Set<String> expandedPaths = new HashSet<>();
@@ -36,10 +37,10 @@ public final class FileExplorer extends PanelCard {
     private boolean restoring;
 
     public FileExplorer(FileNode root, Consumer<FileNode> onOpen) {
-        super("Árbol de la aplicación", "folder");
+        super(I18n.t("explorer.title"), "folder");
         this.onOpen = onOpen;
         getTitleLabel().setFont(Fonts.SECTION);
-        setSubtitle("APK · smali · recursos");
+        setSubtitle(I18n.t("explorer.subtitle"));
 
         tree.setOpaque(false);
         tree.setRowHeight(26);

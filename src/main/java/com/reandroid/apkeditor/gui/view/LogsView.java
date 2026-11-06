@@ -2,6 +2,7 @@ package com.reandroid.apkeditor.gui.view;
 
 import com.reandroid.apkeditor.gui.components.LogConsole;
 import com.reandroid.apkeditor.gui.components.NeonButton;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.theme.*;
 
 import javax.swing.*;
@@ -14,11 +15,11 @@ public final class LogsView extends JPanel {
         setBorder(Theme.empty(24));
 
         JPanel header = Theme.panel(new BorderLayout());
-        JLabel title = new JLabel("OPERATION LOG");
+        JLabel title = new JLabel(I18n.t("logs.title"));
         title.setFont(Fonts.TITLE);
         title.setForeground(Colors.TEXT);
 
-        NeonButton clear = new NeonButton("CLEAR");
+        NeonButton clear = new NeonButton(I18n.t("logs.clear"));
         clear.addActionListener(e -> console.clear());
 
         header.add(title, BorderLayout.WEST);

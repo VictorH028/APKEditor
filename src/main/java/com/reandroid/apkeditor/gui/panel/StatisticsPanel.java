@@ -1,6 +1,7 @@
 package com.reandroid.apkeditor.gui.panel;
 
 import com.reandroid.apkeditor.gui.components.PanelCard;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.ApkAnalysis;
 import com.reandroid.apkeditor.gui.theme.Colors;
 import com.reandroid.apkeditor.gui.theme.Fonts;
@@ -18,16 +19,16 @@ public final class StatisticsPanel extends PanelCard {
     private final Map<String, JLabel> values = new LinkedHashMap<>();
 
     public StatisticsPanel() {
-        super("Estadísticas", "binary");
-        setSubtitle("Análisis");
+        super(I18n.t("statistics.title"), "binary");
+        setSubtitle(I18n.t("statistics.subtitle"));
 
         JPanel body = getBody();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        addRow(body, "Archivos Smali", "file-code", Colors.PRIMARY);
-        addRow(body, "Clases", "layers", Colors.CYAN);
-        addRow(body, "Recursos", "folder", Colors.WARNING);
-        addRow(body, "Permisos", "shield", Colors.SUCCESS);
-        addRow(body, "Componentes", "blocks", Colors.PURPLE);
+        addRow(body, I18n.t("statistics.smaliFiles"), "file-code", Colors.PRIMARY);
+        addRow(body, I18n.t("statistics.classes"), "layers", Colors.CYAN);
+        addRow(body, I18n.t("statistics.resources"), "folder", Colors.WARNING);
+        addRow(body, I18n.t("statistics.permissions"), "shield", Colors.SUCCESS);
+        addRow(body, I18n.t("statistics.components"), "blocks", Colors.PURPLE);
         setAnalysis(ApkAnalysis.demo());
     }
 
@@ -61,11 +62,11 @@ public final class StatisticsPanel extends PanelCard {
         if (analysis == null) {
             return;
         }
-        setValue("Archivos Smali", analysis.getSmaliFiles());
-        setValue("Clases", analysis.getClasses());
-        setValue("Recursos", analysis.getResources());
-        setValue("Permisos", analysis.getPermissions());
-        setValue("Componentes", analysis.getComponents());
+        setValue(I18n.t("statistics.smaliFiles"), analysis.getSmaliFiles());
+        setValue(I18n.t("statistics.classes"), analysis.getClasses());
+        setValue(I18n.t("statistics.resources"), analysis.getResources());
+        setValue(I18n.t("statistics.permissions"), analysis.getPermissions());
+        setValue(I18n.t("statistics.components"), analysis.getComponents());
     }
 
     private void setValue(String key, int value) {

@@ -4,6 +4,7 @@ import com.reandroid.apkeditor.core.OperationRegistry;
 import com.reandroid.apkeditor.gui.components.NeonButton;
 import com.reandroid.apkeditor.gui.components.SidebarButton;
 import com.reandroid.apkeditor.gui.components.StatusDot;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.AppState;
 import com.reandroid.apkeditor.gui.navigation.Route;
 import com.reandroid.apkeditor.gui.panel.AppStatusBar;
@@ -51,19 +52,23 @@ public final class MainWindow extends JFrame {
     private final Map<Route, SidebarButton> navButtons = new LinkedHashMap<>();
     private final PropertyChangeListener inputListener;
     private final PropertyChangeListener themeListener;
+    private final PropertyChangeListener languageListener;
 
     private CardLayout cards;
     private JPanel content;
     private DecompileView workspace;
     private NeonButton apkButton;
     private JComboBox<String> themeSelector;
+    private JComboBox<I18n.Language> languageSelector;
     private Route currentRoute = Route.DECOMPILE;
     private boolean rebuilding;
     private boolean maximized;
     private Rectangle restoredBounds;
 
     public MainWindow() {
-        super("APKEDITOR - Reverse Engineering");
+        super(I18n.t("app.title"));
+        I18n.setLanguage(state.getLanguageCode());
+        setTitle(I18n.t("app.title"));
         Theme.install();
         registry = OperationCatalog.create();
         operations = new OperationService(registry, logs);
@@ -79,8 +84,11 @@ public final class MainWindow extends JFrame {
         inputListener = event -> SwingUtilities.invokeLater(this::updateApkButton);
         themeListener = event -> SwingUtilities.invokeLater(
                 () -> applyTheme((String) event.getNewValue()));
+        languageListener = event -> SwingUtilities.invokeLater(
+                () -> applyLanguage((String) event.getNewValue()));
         state.addPropertyChangeListener(AppState.INPUT_CHANGED, inputListener);
         state.addPropertyChangeListener(AppState.THEME_CHANGED, themeListener);
+        state.addPropertyChangeListener(AppState.LANGUAGE_CHANGED, languageListener);
         updateApkButton();
     }
 
@@ -139,7 +147,7 @@ public final class MainWindow extends JFrame {
         name.setFont(Fonts.TITLE.deriveFont(Font.BOLD, 20f));
         name.setForeground(Colors.TEXT);
 
-        JLabel subtitle = new JLabel("Reverse Engineering");
+        JLabel subtitle = new JLabel(I18n.t("app.brandSubtitle"));
         subtitle.setFont(Fonts.SMALL);
         subtitle.setForeground(Colors.TEXT_SECONDARY);
 
@@ -147,7 +155,7 @@ public final class MainWindow extends JFrame {
         dot.setFont(Fonts.SMALL);
         dot.setForeground(Colors.TEXT_MUTED);
 
-        JLabel tagline = new JLabel("Decode · Build · Analyze");
+        JLabel tagline = new JLabel(I18n.t("app.tagline"));
         tagline.setFont(Fonts.TINY);
         tagline.setForeground(Colors.TEXT_MUTED);
 
@@ -174,7 +182,7 @@ public final class MainWindow extends JFrame {
     }
 
     private JComponent createApkSelector() {
-        apkButton = new NeonButton("MyApplication.apk",
+        apkButton = new NeonButton(I18n.t("apk.placeholder"),
                 IconFactory.icon("file-code", 15, Colors.PRIMARY));
         apkButton.setVariant(NeonButton.Variant.SECONDARY);
         apkButton.setFont(Fonts.BODY_MEDIUM);
@@ -182,7 +190,7 @@ public final class MainWindow extends JFrame {
         apkButton.setIconTextGap(9);
         apkButton.setPreferredSize(new Dimension(330, 36));
         apkButton.setMaximumSize(new Dimension(380, 36));
-        apkButton.setToolTipText("Seleccionar APK (Ctrl+O)");
+        apkButton.setToolTipText(I18n.t("apk.selectTooltip"));
         apkButton.addActionListener(e -> chooseApk());
 
         JLabel chevron = new JLabel(IconFactory.icon("chevron-down", 12,
@@ -208,13 +216,13 @@ public final class MainWindow extends JFrame {
     }
 
     private JComponent createTopActions() {
-        JLabel themeLabel = new JLabel("TEMA");
+        JLabel themeLabel = new JLabel(I18n.t("topbar.theme"));
         themeLabel.setFont(Fonts.TINY);
         themeLabel.setForeground(Colors.TEXT_MUTED);
 
         themeSelector = new JComboBox<>(Theme.NAMES);
         themeSelector.setSelectedItem(state.getThemeName());
-        themeSelector.setPreferredSize(new Dimension(128, 30));
+        themeSelector.setPreferredSize(new Dimension(120, 30));
         themeSelector.setFont(Fonts.SMALL);
         themeSelector.setBackground(Colors.SURFACE_2);
         themeSelector.setForeground(Colors.TEXT);
@@ -243,11 +251,47 @@ public final class MainWindow extends JFrame {
             }
         });
 
-        NeonButton minimize = windowButton("minimize", "Minimizar");
+        JLabel languageLabel = new JLabel(I18n.t("topbar.language"));
+        languageLabel.setFont(Fonts.TINY);
+        languageLabel.setForeground(Colors.TEXT_MUTED);
+
+        languageSelector = new JComboBox<>(I18n.Language.values());
+        languageSelector.setSelectedItem(I18n.getLanguage());
+        languageSelector.setPreferredSize(new Dimension(104, 30));
+        languageSelector.setFont(Fonts.SMALL);
+        languageSelector.setBackground(Colors.SURFACE_2);
+        languageSelector.setForeground(Colors.TEXT);
+        languageSelector.setFocusable(false);
+        languageSelector.setBorder(BorderFactory.createLineBorder(Colors.BORDER));
+        languageSelector.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                    int index, boolean selected, boolean focus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                        list, value, index, selected, focus);
+                label.setFont(Fonts.SMALL);
+                label.setBackground(selected ? Colors.PANEL_HOVER : Colors.SURFACE_2);
+                label.setForeground(selected ? Colors.PRIMARY_BRIGHT : Colors.TEXT);
+                label.setBorder(BorderFactory.createEmptyBorder(3, 7, 3, 7));
+                return label;
+            }
+        });
+        languageSelector.addActionListener(e -> {
+            if (rebuilding) {
+                return;
+            }
+            Object selected = languageSelector.getSelectedItem();
+            if (selected instanceof I18n.Language language
+                    && !language.getCode().equals(state.getLanguageCode())) {
+                state.setLanguageCode(language.getCode());
+            }
+        });
+
+        NeonButton minimize = windowButton("minimize", I18n.t("window.minimize"));
         minimize.addActionListener(e -> setState(ICONIFIED));
-        NeonButton maximize = windowButton("maximize", "Maximizar");
+        NeonButton maximize = windowButton("maximize", I18n.t("window.maximize"));
         maximize.addActionListener(e -> toggleMaximize());
-        NeonButton close = windowButton("close", "Cerrar");
+        NeonButton close = windowButton("close", I18n.t("window.close"));
         close.addActionListener(e -> dispatchEvent(
                 new WindowEvent(this, WindowEvent.WINDOW_CLOSING)));
 
@@ -255,6 +299,8 @@ public final class MainWindow extends JFrame {
         actions.setOpaque(false);
         actions.add(themeLabel);
         actions.add(themeSelector);
+        actions.add(languageLabel);
+        actions.add(languageSelector);
         actions.add(Box.createHorizontalStrut(6));
         actions.add(minimize);
         actions.add(maximize);
@@ -283,16 +329,16 @@ public final class MainWindow extends JFrame {
         nav.setBackground(Colors.BACKGROUND_SECONDARY);
         nav.setBorder(BorderFactory.createEmptyBorder(16, 12, 12, 12));
 
-        addNav(nav, "Dashboard", "house", Route.DASHBOARD);
-        addNav(nav, "Descompilar", "file-code", Route.DECOMPILE);
-        addNav(nav, "Analizar", "scan-search", Route.ANALYZE);
-        addNav(nav, "Smali Viewer", "binary", Route.SMALI_VIEWER);
-        addNav(nav, "Build", "package", Route.BUILD);
-        addNav(nav, "Merge", "git-merge", Route.MERGE);
-        addNav(nav, "Refactor", "workflow", Route.REFACTOR);
-        addNav(nav, "Proteger", "shield", Route.PROTECT);
-        addNav(nav, "Información", "info", Route.INFORMATION);
-        addNav(nav, "Configuración", "settings", Route.SETTINGS);
+        addNav(nav, I18n.t("nav.dashboard"), "house", Route.DASHBOARD);
+        addNav(nav, I18n.t("nav.decompile"), "file-code", Route.DECOMPILE);
+        addNav(nav, I18n.t("nav.analyze"), "scan-search", Route.ANALYZE);
+        addNav(nav, I18n.t("nav.smaliViewer"), "binary", Route.SMALI_VIEWER);
+        addNav(nav, I18n.t("nav.build"), "package", Route.BUILD);
+        addNav(nav, I18n.t("nav.merge"), "git-merge", Route.MERGE);
+        addNav(nav, I18n.t("nav.refactor"), "workflow", Route.REFACTOR);
+        addNav(nav, I18n.t("nav.protect"), "shield", Route.PROTECT);
+        addNav(nav, I18n.t("nav.information"), "info", Route.INFORMATION);
+        addNav(nav, I18n.t("nav.settings"), "settings", Route.SETTINGS);
         nav.add(Box.createVerticalGlue());
 
         JScrollPane scroll = new JScrollPane(nav);
@@ -327,10 +373,10 @@ public final class MainWindow extends JFrame {
         JLabel name = new JLabel("APKEDITOR");
         name.setFont(Fonts.BODY.deriveFont(Font.BOLD));
         name.setForeground(Colors.TEXT);
-        JLabel version = new JLabel("v1.0.0");
+        JLabel version = new JLabel(I18n.t("app.version"));
         version.setFont(Fonts.TINY);
         version.setForeground(Colors.TEXT_MUTED);
-        JLabel description = new JLabel("Reverse engineering en tus manos");
+        JLabel description = new JLabel(I18n.t("app.sidebarTagline"));
         description.setFont(Fonts.TINY);
         description.setForeground(Colors.TEXT_MUTED);
 
@@ -403,9 +449,9 @@ public final class MainWindow extends JFrame {
 
     private void chooseApk() {
         JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Seleccionar APK");
+        chooser.setDialogTitle(I18n.t("apk.dialogTitle"));
         chooser.setFileFilter(new FileNameExtensionFilter(
-                "APK / ZIP / AAB", "apk", "zip", "aab"));
+                I18n.t("apk.filter"), "apk", "zip", "aab"));
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             loadApk(chooser.getSelectedFile());
         }
@@ -413,11 +459,11 @@ public final class MainWindow extends JFrame {
 
     public void loadApk(File file) {
         if (file == null || !file.exists()) {
-            logs.warning("El APK seleccionado no existe.");
+            logs.warning(I18n.t("log.apk.notExists"));
             return;
         }
         state.setCurrentInput(file);
-        logs.info("Cargando APK: " + file.getName());
+        logs.info(I18n.t("log.apk.loading", file.getName()));
         new SwingWorker<ApkService.Result, Void>() {
             @Override
             protected ApkService.Result doInBackground() throws Exception {
@@ -433,11 +479,12 @@ public final class MainWindow extends JFrame {
                     for (String message : result.getMessages()) {
                         logs.info(message);
                     }
-                    logs.success("APK cargado: " + result.getAnalysis().getAppName()
-                            + " · " + result.getAnalysis().getFileCount() + " archivos");
+                    logs.success(I18n.t("log.apk.loaded",
+                            result.getAnalysis().getAppName(),
+                            result.getAnalysis().getFileCount()));
                     showRoute(Route.DECOMPILE, true);
                 } catch (Exception error) {
-                    logs.error("No se pudo analizar el APK: " + shortMessage(error));
+                    logs.error(I18n.t("log.apk.analyzeError", shortMessage(error)));
                 }
             }
         }.execute();
@@ -448,9 +495,9 @@ public final class MainWindow extends JFrame {
             return;
         }
         File input = state.getCurrentInput();
-        apkButton.setText(input == null ? "MyApplication.apk" : input.getName());
+        apkButton.setText(input == null ? I18n.t("apk.placeholder") : input.getName());
         apkButton.setToolTipText(input == null
-                ? "Seleccionar APK (Ctrl+O)" : input.getAbsolutePath());
+                ? I18n.t("apk.selectTooltip") : input.getAbsolutePath());
     }
 
     private void applyTheme(String name) {
@@ -461,6 +508,20 @@ public final class MainWindow extends JFrame {
         try {
             Theme.apply(name);
             Theme.install();
+            buildUI();
+        } finally {
+            rebuilding = false;
+        }
+    }
+
+    private void applyLanguage(String code) {
+        if (rebuilding) {
+            return;
+        }
+        rebuilding = true;
+        try {
+            I18n.setLanguage(code);
+            setTitle(I18n.t("app.title"));
             buildUI();
         } finally {
             rebuilding = false;

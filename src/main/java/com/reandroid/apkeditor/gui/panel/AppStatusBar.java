@@ -2,6 +2,7 @@ package com.reandroid.apkeditor.gui.panel;
 
 import com.reandroid.apkeditor.gui.components.NeonProgressBar;
 import com.reandroid.apkeditor.gui.components.StatusDot;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.AppState;
 import com.reandroid.apkeditor.gui.theme.Colors;
 import com.reandroid.apkeditor.gui.theme.Fonts;
@@ -14,9 +15,9 @@ import java.awt.*;
  */
 public final class AppStatusBar extends JPanel {
     private final AppState state;
-    private final JLabel system = new JLabel("Sistema listo");
+    private final JLabel system = new JLabel(I18n.t("status.ready"));
     private final StatusDot dot = new StatusDot(Colors.SUCCESS);
-    private final JLabel memory = new JLabel("Memoria: —");
+    private final JLabel memory = new JLabel(I18n.t("status.memory", "—"));
     private final NeonProgressBar memoryBar = new NeonProgressBar();
     private final Timer timer;
 
@@ -50,7 +51,7 @@ public final class AppStatusBar extends JPanel {
         memoryBar.setAccent(Colors.SUCCESS);
         left.add(memoryBar);
 
-        JLabel footer = new JLabel("ANALIZA  //  DESCOMPILA  //  EXPLORA  //  CREA");
+        JLabel footer = new JLabel(I18n.t("status.footer"));
         footer.setFont(Fonts.TINY.deriveFont(Font.BOLD));
         footer.setForeground(Colors.TEXT_MUTED);
 
@@ -74,11 +75,11 @@ public final class AppStatusBar extends JPanel {
 
     public void setBusy(boolean busy) {
         if (busy) {
-            system.setText("Procesando...");
+            system.setText(I18n.t("status.processing"));
             system.setForeground(Colors.WARNING);
             dot.setColor(Colors.WARNING);
         } else {
-            system.setText("Sistema listo");
+            system.setText(I18n.t("status.ready"));
             system.setForeground(Colors.SUCCESS);
             dot.setColor(Colors.SUCCESS);
         }
@@ -94,7 +95,7 @@ public final class AppStatusBar extends JPanel {
         Runtime runtime = Runtime.getRuntime();
         long used = runtime.totalMemory() - runtime.freeMemory();
         long max = runtime.maxMemory();
-        memory.setText("Memoria: " + format(used) + " / " + format(max));
+        memory.setText(I18n.t("status.memory", format(used) + " / " + format(max)));
         memoryBar.setValue(max <= 0 ? 0 : (int) Math.min(100, used * 100 / max));
     }
 

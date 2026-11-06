@@ -1,5 +1,7 @@
 package com.reandroid.apkeditor.gui.model;
 
+import com.reandroid.apkeditor.gui.i18n.I18n;
+
 public final class ApkAnalysis {
     private String appName = "MyApplication";
     private String packageName = "com.example.myapp";
@@ -24,7 +26,7 @@ public final class ApkAnalysis {
     }
 
     public void setAppName(String appName) {
-        this.appName = valueOr(appName, "Sin nombre");
+        this.appName = valueOr(appName, I18n.t("common.unnamed"));
     }
 
     public String getPackageName() {

@@ -1,6 +1,7 @@
 package com.reandroid.apkeditor.gui.service;
 
 import com.reandroid.apk.ApkModule;
+import com.reandroid.apkeditor.gui.i18n.I18n;
 import com.reandroid.apkeditor.gui.model.ApkAnalysis;
 import com.reandroid.apkeditor.gui.model.FileNode;
 import com.reandroid.apkeditor.gui.model.SourceFile;
@@ -63,7 +64,7 @@ public final class ApkService {
             return new Result(analysis, tree, messages);
         }
         if (!file.exists()) {
-            throw new IOException("No existe el archivo: " + file.getAbsolutePath());
+            throw new IOException(I18n.t("apk.error.notFound", file.getAbsolutePath()));
         }
         analysis.setAppName(stripExtension(file.getName()));
         analysis.setApkSize(file.isFile() ? file.length() : directorySize(file));
@@ -116,7 +117,7 @@ public final class ApkService {
         boolean binary = isBinaryName(name) || containsNul(bytes);
         if (binary) {
             String hex = hexDump(bytes, 4096);
-            String content = "; APKEDITOR - vista hexadecimal (binario)\n"
+            String content = I18n.t("apk.hexHeader") + "\n"
                     + "; " + path + "\n\n" + hex;
             return new SourceFile(name, path, content, "hex", true);
         }
@@ -142,7 +143,7 @@ public final class ApkService {
                 }
                 count++;
                 if (count > 6000) {
-                    messages.add("Árbol limitado a 6000 entradas para mantener la interfaz fluida.");
+                    messages.add(I18n.t("apk.error.treeLimit"));
                     break;
                 }
                 addZipEntry(root, path, entry.getSize(), entry.isDirectory());
@@ -278,7 +279,7 @@ public final class ApkService {
                 analysis.setComponents(components);
             }
         } catch (Throwable error) {
-            messages.add("No se pudo leer el manifest: " + shortMessage(error));
+            messages.add(I18n.t("apk.error.manifest", shortMessage(error)));
         }
 
         try {
@@ -294,7 +295,7 @@ public final class ApkService {
                 dex.close();
             }
         } catch (Throwable error) {
-            messages.add("No se pudieron contar las clases: " + shortMessage(error));
+            messages.add(I18n.t("apk.error.classes", shortMessage(error)));
         } finally {
             if (module != null) {
                 try {
@@ -313,7 +314,7 @@ public final class ApkService {
         analysis.setResources(stats[2]);
         analysis.setClasses(stats[1]);
         analysis.setPackageName(guessPackage(directory));
-        messages.add("Proyecto descompilado cargado desde " + directory.getAbsolutePath());
+        messages.add(I18n.t("apk.error.projectLoaded", directory.getAbsolutePath()));
     }
 
     private static void walkStats(File dir, int[] stats) {
@@ -476,7 +477,7 @@ public final class ApkService {
             builder.append("|\n");
         }
         if (bytes.length > max) {
-            builder.append("... (truncado)\n");
+            builder.append(I18n.t("apk.hexTruncated")).append('\n');
         }
         return builder.toString();
     }
